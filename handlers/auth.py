@@ -92,12 +92,13 @@ async def login_password(message: Message, state: FSMContext):
     
     user.telegram_id = message.from_user.id
     user.last_login = func.now()
+    nickname = user.nickname
     session.commit()
     session.close()
     
     await state.clear()
     await message.answer(
-        f"Добро пожаловать, {user.nickname}!",
+        f"Добро пожаловать, {nickname}!",
         reply_markup=get_main_keyboard()
     )
 
@@ -260,12 +261,15 @@ async def register_verify(message: Message, state: FSMContext):
         if user:
             user.verified = True
             session.commit()
+            nickname = user.nickname
+        else:
+            nickname = data.get("nickname", "")
         session.close()
         
         await state.clear()
         await message.answer(
             "Аккаунт подтвержден! Теперь вы можете выйти из клана.\n"
-            "Добро пожаловать в ESBrawlElite!",
+            f"Добро пожаловать в ESBrawlElite, {nickname}!",
             reply_markup=get_main_keyboard()
         )
     else:
