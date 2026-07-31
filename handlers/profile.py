@@ -36,15 +36,18 @@ async def cmd_profile(message: Message):
     division = get_division(user.elo)
     total_games = user.wins + user.losses
     winrate = round(user.wins / total_games * 100, 1) if total_games > 0 else 0
+    reg_date = user.created_at.strftime("%d.%m.%Y") if user.created_at else "—"
     
     text = (
+        f"ID: {user.id}\n"
         f"Nickname: {user.nickname}\n"
         f"Tag: {user.brawl_tag} | {user.brawl_name}\n"
         f"Rank: {division} | {user.elo} ELO\n"
         f"Winrate: {winrate}%\n"
         f"Games: {total_games}\n"
         f"Wins: {user.wins}\n"
-        f"Losses: {user.losses}\n\n"
+        f"Losses: {user.losses}\n"
+        f"Registered: {reg_date}\n\n"
         f"{user.description}"
     )
     
