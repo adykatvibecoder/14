@@ -148,7 +148,14 @@ async def register_password(message: Message, state: FSMContext):
     ).first()
     
     if existing:
-        await message.answer("Такой никнейм, почта или тег уже заняты.")
+        if existing.nickname == data["nickname"]:
+            await message.answer("Этот никнейм уже занят.")
+        elif existing.email == data["email"]:
+            await message.answer("Эта почта уже используется.")
+        elif existing.brawl_tag == data["brawl_tag"]:
+            await message.answer("Этот тег уже зарегистрирован.")
+        else:
+            await message.answer("Аккаунт с такими данными уже существует.")
         session.close()
         return
     
