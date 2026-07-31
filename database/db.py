@@ -1,7 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+import os
 
-engine = create_engine("sqlite:///esbrawlelite.db")
+DATA_DIR = os.getenv("DATA_DIR", "/app/data")
+DB_PATH = os.path.join(DATA_DIR, "esbrawlelite.db")
+
+engine = create_engine(f"sqlite:///{DB_PATH}")
 Session = sessionmaker(bind=engine)
 
 class Base(DeclarativeBase):
