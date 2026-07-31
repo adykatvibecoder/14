@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from sqlalchemy.sql import func
 from database.db import Session
 from database.models import User
 from services.brawl_api import get_player, is_tag_in_club
@@ -17,13 +18,69 @@ class Registration(StatesGroup):
     waiting_for_password = State()
     waiting_for_verify = State()
 
+class Login(StatesGroup):
+    waiting_for_login = State()
+    waiting_for_password = State()
+
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
+# Вход
+@router.message(F.text == "Вход")
+async def login_start(message: Message, state: FSMContext):
+    await state.set_state(Login.waiting_for_login)
+    await message.answer("Введите почту или никнейм:", reply_markup=ReplyKeyboardRemove())
+
+@router.message(Login.waiting_for_login)
+async def login_check(message: Message, state: FSMContext):
+    login = message.text.strip()
+    session = Session()
+    user = session.query(User).filter(
+        (User.email == login) | (User.nickname == login)
+    ).first()
+    
+    if not user:
+        await message.answer("Аккаунт не найден. Попробуйте снова.")
+        session.close()
+        return
+    
+    await state.update_data(user_id=user.telegram_id)
+    session.close()
+    await state.set_state(Login.waiting_for_password)
+    await message.answer("Введите пароль:")
+
+@router.message(Login.waiting_for_password)
+async def login_password(message: Message, state: FSMContext):
+    password = message.text.strip()
+    data = await state.get_data()
+    
+    session = Session()
+    user = session.query(User).filter_by(telegram_id=data["user_id"]).first()
+    
+    if not user or user.password_hash != hash_password(password):
+        await message.answer("Неверный пароль.")
+        session.close()
+        return
+    
+    user.telegram_id = message.from_user.id
+    user.last_login = func.now()
+    session.commit()
+    session.close()
+    
+    await state.clear()
+    await message.answer(
+        f"Добро пожаловать, {user.nickname}!",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+# Старт
 @router.message(F.text == "/start")
 async def cmd_start(message: Message):
     kb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Регистрация"), KeyboardButton(text="Вход")]],
+        keyboard=[
+            [KeyboardButton(text="Профиль")],
+            [KeyboardButton(text="Регистрация"), KeyboardButton(text="Вход")]
+        ],
         resize_keyboard=True
     )
     await message.answer(
@@ -33,6 +90,7 @@ async def cmd_start(message: Message):
         reply_markup=kb
     )
 
+# Регистрация
 @router.message(F.text == "Регистрация")
 async def register_start(message: Message, state: FSMContext):
     await state.set_state(Registration.waiting_for_nickname)
