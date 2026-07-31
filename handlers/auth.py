@@ -29,7 +29,16 @@ def hash_password(password: str) -> str:
 @router.message(F.text == "Вход")
 async def login_start(message: Message, state: FSMContext):
     await state.set_state(Login.waiting_for_login)
-    await message.answer("Введите почту или никнейм:", reply_markup=ReplyKeyboardRemove())
+    kb = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="Отмена")]],
+        resize_keyboard=True
+    )
+    await message.answer("Введите почту или никнейм:", reply_markup=kb)
+
+@router.message(Login.waiting_for_login, F.text == "Отмена")
+async def login_cancel(message: Message, state: FSMContext):
+    await state.clear()
+    await cmd_start(message)
 
 @router.message(Login.waiting_for_login)
 async def login_check(message: Message, state: FSMContext):
@@ -40,7 +49,7 @@ async def login_check(message: Message, state: FSMContext):
     ).first()
     
     if not user:
-        await message.answer("Аккаунт не найден. Попробуйте снова.")
+        await message.answer("Аккаунт не найден. Попробуйте снова или нажмите Отмена.")
         session.close()
         return
     
@@ -48,6 +57,11 @@ async def login_check(message: Message, state: FSMContext):
     session.close()
     await state.set_state(Login.waiting_for_password)
     await message.answer("Введите пароль:")
+
+@router.message(Login.waiting_for_password, F.text == "Отмена")
+async def login_password_cancel(message: Message, state: FSMContext):
+    await state.clear()
+    await cmd_start(message)
 
 @router.message(Login.waiting_for_password)
 async def login_password(message: Message, state: FSMContext):
@@ -58,7 +72,7 @@ async def login_password(message: Message, state: FSMContext):
     user = session.query(User).filter_by(telegram_id=data["user_id"]).first()
     
     if not user or user.password_hash != hash_password(password):
-        await message.answer("Неверный пароль.")
+        await message.answer("Неверный пароль. Попробуйте снова или нажмите Отмена.")
         session.close()
         return
     
@@ -178,6 +192,7 @@ async def register_password(message: Message, state: FSMContext):
     )
     await message.answer(
         f"Для подтверждения аккаунта вступите в клан:\n"
+        f"Название: ESBrawlVerify\n"
         f"Тег: {VERIFY_CLUB_TAG}\n"
         f"Требования: 30 000 кубков\n\n"
         f"Как вступили — нажмите кнопку:",
