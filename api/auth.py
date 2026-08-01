@@ -306,8 +306,10 @@ async def create_room(request):
     member = RoomMember(room_id=room.id, user_id=user_id)
     session.add(member)
     session.commit()
+    room_id = room.id
+    room_code = room.code
     session.close()
-    return web.json_response({"room_id": room.id, "code": code})
+    return web.json_response({"room_id": room_id, "code": room_code})
 
 async def join_room(request):
     data = await request.json()
