@@ -6,7 +6,7 @@
     <title>ESBrawlElite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ===== CSS-переменные ===== */
+        /* ===== Все стили (без изменений) ===== */
         :root {
             --bg: #ffffff;
             --text: #000000;
@@ -41,681 +41,369 @@
             --success-color: #4CAF50;
             --modal-bg: rgba(255,255,255,0.85);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            width: 100%; height: 100%;
-            background: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            overflow: hidden;
-        }
+        html, body { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
         body { display: flex; justify-content: center; align-items: center; }
-
-        /* Аутентификация */
         .auth-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 28px 20px;
-            color: var(--text);
-            width: 90%; max-width: 400px;
-            box-shadow: var(--card-shadow);
-            animation: float 3s ease-in-out infinite, fadeInUp 0.5s ease-out;
-            will-change: transform;
+            background: var(--card-bg); border-radius: 24px; padding: 28px 20px; color: var(--text);
+            width: 90%; max-width: 400px; box-shadow: var(--card-shadow);
+            animation: float 3s ease-in-out infinite, fadeInUp 0.5s ease-out; will-change: transform;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes shine {
-            0% { left: -150%; }
-            100% { left: 200%; }
-        }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes shine { 0%{left:-150%;} 100%{left:200%;} }
         .auth-card h2 { font-size: 20px; margin-bottom: 18px; text-align: center; color: var(--text); }
         .hidden { display: none !important; }
-
-        /* Главный экран */
-        .main-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            padding: 10px 10px 0;
-            color: var(--text);
-            z-index: 10;
-        }
-
-        /* Общие элементы */
+        .main-screen { position: fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); display:flex; flex-direction:column; padding:10px 10px 0; color:var(--text); z-index:10; }
         .input, .textarea {
-            width: 100%; padding: 14px; margin: 7px 0;
-            border: 1px solid var(--input-border); border-radius: 12px;
-            font-size: 15px; background: var(--input-bg); color: var(--text);
-            outline: none; -webkit-appearance: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            width:100%; padding:14px; margin:7px 0; border:1px solid var(--input-border); border-radius:12px;
+            font-size:15px; background:var(--input-bg); color:var(--text); outline:none; -webkit-appearance:none;
+            transition:border-color 0.2s, box-shadow 0.2s;
         }
-        .input:focus, .textarea:focus {
-            border-color: var(--link-color); box-shadow: 0 0 0 3px var(--input-focus-shadow);
-        }
-        .textarea { resize: none; overflow: hidden; min-height: 60px; font-family: inherit; }
-
+        .input:focus, .textarea:focus { border-color:var(--link-color); box-shadow:0 0 0 3px var(--input-focus-shadow); }
+        .textarea { resize:none; overflow:hidden; min-height:60px; font-family:inherit; }
         .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer; margin: 9px 0;
-            transition: all 0.2s ease;
+            width:100%; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:600;
+            cursor:pointer; margin:9px 0; transition:all 0.2s ease;
         }
-        .btn.primary { background: var(--btn-primary-bg); color: var(--btn-primary-text); }
-        .btn.primary:active { background: var(--btn-primary-hover); transform: scale(0.97); }
+        .btn.primary { background:var(--btn-primary-bg); color:var(--btn-primary-text); }
+        .btn.primary:active { background:var(--btn-primary-hover); transform:scale(0.97); }
         .btn.danger {
-            background: var(--btn-danger-bg); color: var(--btn-danger-text);
-            border: 1px solid var(--btn-danger-border); padding: 8px 14px;
-            font-size: 13px; width: auto; display: inline-block; margin: 5px 0;
+            background:var(--btn-danger-bg); color:var(--btn-danger-text); border:1px solid var(--btn-danger-border);
+            padding:8px 14px; font-size:13px; width:auto; display:inline-block; margin:5px 0;
         }
-        .links { text-align: center; margin-top: 14px; font-size: 13px; color: #666; }
-        .links a { color: var(--link-color); text-decoration: none; cursor: pointer; display: block; margin: 6px 0; transition: color 0.2s; }
-        .error { color: var(--error-color); font-size: 13px; margin: 5px 0; text-align: center; }
-        .success { color: var(--success-color); font-size: 13px; margin: 5px 0; text-align: center; }
-
-        /* Профиль */
+        .links { text-align:center; margin-top:14px; font-size:13px; color:#666; }
+        .links a { color:var(--link-color); text-decoration:none; cursor:pointer; display:block; margin:6px 0; transition:color 0.2s; }
+        .error { color:var(--error-color); font-size:13px; margin:5px 0; text-align:center; }
+        .success { color:var(--success-color); font-size:13px; margin:5px 0; text-align:center; }
         .banner-section {
-            position: relative; border-radius: 14px; padding: 16px; margin-bottom: 16px;
-            overflow: hidden; background-size: cover; background-position: center;
-            min-height: 120px; display: flex; align-items: center;
+            position:relative; border-radius:14px; padding:16px; margin-bottom:16px; overflow:hidden;
+            background-size:cover; background-position:center; min-height:120px; display:flex; align-items:center;
         }
         .banner-shine {
-            position: absolute; top: -50%; left: -150%; width: 80%; height: 200%;
-            background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
-            transform: skewX(-20deg); animation: shine 3s ease-in-out infinite;
+            position:absolute; top:-50%; left:-150%; width:80%; height:200%;
+            background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+            transform:skewX(-20deg); animation:shine 3s ease-in-out infinite;
         }
         .banner-edit {
-            position: absolute; top: 8px; right: 8px; z-index: 1;
-            width: 26px; height: 26px; border: none; font-size: 14px; cursor: pointer;
-            display: none; align-items: center; justify-content: center;
-            background: transparent; color: #fff; text-shadow: 0 0 4px rgba(0,0,0,0.5);
+            position:absolute; top:8px; right:8px; z-index:1; width:26px; height:26px; border:none;
+            font-size:14px; cursor:pointer; display:none; align-items:center; justify-content:center;
+            background:transparent; color:#fff; text-shadow:0 0 4px rgba(0,0,0,0.5);
         }
-        .banner-edit.visible { display: flex; }
-        .banner-content { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+        .banner-edit.visible { display:flex; }
+        .banner-content { display:flex; align-items:center; gap:14px; position:relative; z-index:1; }
         .avatar-wrap {
-            position: relative; flex-shrink: 0;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(4px);
-            border-radius: 50%;
-            padding: 2px;
+            position:relative; flex-shrink:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px);
+            border-radius:50%; padding:2px;
         }
         .avatar-img {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.5); object-fit: cover;
-            background: rgba(255,255,255,0.2);
-            display: block;
+            width:70px; height:70px; border-radius:50%; border:3px solid rgba(255,255,255,0.5);
+            object-fit:cover; background:rgba(255,255,255,0.2); display:block;
         }
         .avatar-placeholder {
-            width: 70px; height: 70px; border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.2);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; color: #fff;
+            width:70px; height:70px; border-radius:50%; border:3px solid rgba(255,255,255,0.5);
+            background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;
+            font-size:28px; color:#fff;
         }
         .avatar-edit {
-            position: absolute; bottom: -2px; right: -2px; font-size: 16px; cursor: pointer;
-            color: #fff; text-shadow: 0 0 4px rgba(0,0,0,0.7); background: transparent; border: none;
+            position:absolute; bottom:-2px; right:-2px; font-size:16px; cursor:pointer;
+            color:#fff; text-shadow:0 0 4px rgba(0,0,0,0.7); background:transparent; border:none;
         }
         .top-badge {
-            position: absolute; top: -4px; left: -4px;
-            background: #ffd700; color: #000; font-size: 9px; font-weight: bold; padding: 1px 6px;
-            border-radius: 10px 2px 10px 2px; z-index: 3;
-            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+            position:absolute; top:-4px; left:-4px; background:#ffd700; color:#000; font-size:9px;
+            font-weight:bold; padding:1px 6px; border-radius:10px 2px 10px 2px; z-index:3;
+            box-shadow:0 0 4px rgba(0,0,0,0.3);
         }
-        .banner-info { flex: 1; color: #fff; }
+        .banner-info { flex:1; color:#fff; }
         .banner-info .info-group {
-            display: inline-block;
-            background: rgba(0,0,0,0.35);
-            backdrop-filter: blur(4px);
-            border-radius: 12px;
-            padding: 6px 12px;
-            margin: 2px 0;
+            display:inline-block; background:rgba(0,0,0,0.35); backdrop-filter:blur(4px);
+            border-radius:12px; padding:6px 12px; margin:2px 0;
         }
-        .banner-nickname { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
-        .banner-tag { font-size: 11px; opacity: 0.9; }
+        .banner-nickname { font-size:18px; font-weight:bold; display:flex; align-items:center; gap:4px; }
+        .banner-tag { font-size:11px; opacity:0.9; }
         .banner-rank {
-            display: inline-block; padding: 3px 10px; border-radius: 20px;
-            font-size: 11px; font-weight: 600; margin-top: 4px;
-            background: rgba(255,255,255,0.2);
+            display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px;
+            font-weight:600; margin-top:4px; background:rgba(255,255,255,0.2);
         }
-        .banner-elo { font-size: 13px; opacity: 0.9; margin-left: 6px; }
-        .info-section { margin-top: 12px; }
-        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: var(--info-label); }
-        .info-value { color: var(--info-value); font-weight: 500; }
-        .description-box { margin-top: 12px; padding: 12px; background: var(--description-bg); border-radius: 10px; font-size: 13px; color: var(--description-text); text-align: center; position: relative; }
-        .description-edit { position: absolute; top: 6px; right: 10px; font-size: 14px; color: var(--info-label); cursor: pointer; }
-        .logout-btn { margin-top: 16px; width: 100%; padding: 12px; border: 1px solid var(--btn-danger-border); border-radius: 12px; background: var(--btn-danger-bg); color: var(--btn-danger-text); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .logout-btn:active { background: #fef0f0; }
-
-        /* Вкладки */
-        .tab { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-        .tab button { flex: 1; padding: 10px 4px; min-height: 38px; border: none; background: var(--tab-bg); color: var(--tab-text); font-size: 11px; font-weight: 500; cursor: pointer; border-radius: 10px; transition: all 0.2s; white-space: nowrap; -webkit-tap-highlight-color: transparent; user-select: none; display: flex; align-items: center; justify-content: center; }
-        .tab button.active { background: var(--tab-active-bg); color: var(--tab-active-text); }
-        .tab-content { flex: 1; overflow-y: auto; padding-top: 8px; }
-
-        /* Настройки */
-        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border-color); }
-        .setting-label { font-size: 14px; color: var(--text); }
-        .setting-control { display: flex; align-items: center; gap: 8px; }
-        .toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--toggle-bg); position: relative; cursor: pointer; transition: background 0.3s; }
-        .toggle.active { background: var(--toggle-active); }
-        .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left 0.3s; }
-        .toggle.active::after { left: 21px; }
-        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
-        .color-dot:hover { transform: scale(1.2); }
-        .color-dot.active { border-color: var(--text); }
-        .select-row { display: flex; gap: 6px; flex-wrap: wrap; }
-        .select-option { padding: 5px 12px; border-radius: 16px; font-size: 11px; cursor: pointer; border: 1px solid var(--select-option-border); background: var(--select-option-bg); color: var(--text); transition: all 0.2s; }
-        .select-option.active { background: var(--select-option-active-bg); color: var(--select-option-active-text); border-color: var(--select-option-active-bg); }
-
-        /* Лог боев */
-        .battle-list { display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px; }
-        .battle-card { border-radius: 12px; padding: 12px; color: #fff; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; background-size: cover; background-position: center; }
-        .battle-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px; }
-        .battle-mode { font-weight: 700; }
-        .battle-teams { display: flex; justify-content: space-between; align-items: center; margin: 6px 0; }
-        .team { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
-        .team.right { justify-content: flex-end; }
-        .team-player { display: flex; flex-direction: column; align-items: center; font-size: 10px; cursor: pointer; transition: transform 0.2s; }
-        .team-player:hover { transform: scale(1.1); }
-        .team-player .mini-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin-bottom: 2px; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.3); }
-        .team-player .nick { max-width: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .vs-label { font-weight: 700; font-size: 12px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .battle-rounds { margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 6px; }
-        .round { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; }
-        .round .round-content { background: rgba(0,0,0,0.25); backdrop-filter: blur(2px); border-radius: 8px; padding: 2px 8px; display: inline-flex; align-items: center; gap: 12px; }
-        .round .r-result.win { color: #4CAF50; }
-        .round .r-result.loss { color: #f44336; }
-        .round .r-time { color: rgba(255,255,255,0.8); }
-        .battle-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.2); }
-        .battle-footer .battle-result { font-weight: 700; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); border-radius: 20px; padding: 4px 12px; font-size: 13px; }
-        .battle-footer .battle-result.win { color: #4CAF50; }
-        .battle-footer .battle-result.loss { color: #f44336; }
-        .battle-footer .battle-time { font-size: 11px; opacity: 0.7; }
-
-        /* Друзья */
-        .friends-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-        .friends-tabs button { flex: 1; padding: 8px 4px; border: none; border-radius: 10px; background: var(--tab-bg); color: var(--tab-text); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-        .friends-tabs button.active { background: var(--tab-active-bg); color: var(--tab-active-text); }
-        .friend-card { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 8px; transition: transform 0.2s, box-shadow 0.2s; }
-        .friend-card:hover { transform: translateX(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .friend-card .f-avatar { width: 36px; height: 36px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; background: var(--input-bg); }
-        .friend-card .f-info { flex: 1; display: flex; flex-direction: column; }
-        .friend-card .f-name { font-size: 14px; font-weight: 600; color: var(--text); }
-        .friend-card .f-tag { font-size: 11px; color: var(--info-label); }
-        .friend-card .f-elo { background: rgba(0,0,0,0.25); backdrop-filter: blur(4px); border-radius: 20px; padding: 2px 12px; font-size: 13px; font-weight: 600; color: var(--text); margin-left: 8px; flex-shrink: 0; }
-        .friend-card .f-actions { display: flex; gap: 6px; margin-left: 8px; }
-        .friend-card .f-actions button { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--tab-bg); color: var(--text); font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-        .friend-card .f-actions button.accept { background: var(--success-color); color: #fff; }
-        .friend-card .f-actions button.reject { background: var(--error-color); color: #fff; }
-        .friend-card .f-actions button.remove { background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); color: var(--error-color); font-size: 16px; }
-        .friend-card .f-actions button:hover { transform: scale(1.1); }
-        .friend-card .f-actions button.add-btn { background: var(--btn-primary-bg); color: var(--btn-primary-text); width: auto; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .search-input { margin-bottom: 12px; }
-        .search-results { margin-top: 8px; }
-
-        /* Топ */
-        .leaderboard-list { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .banner-elo { font-size:13px; opacity:0.9; margin-left:6px; }
+        .info-section { margin-top:12px; }
+        .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border-color); font-size:14px; }
+        .info-row:last-child { border-bottom:none; }
+        .info-label { color:var(--info-label); }
+        .info-value { color:var(--info-value); font-weight:500; }
+        .description-box {
+            margin-top:12px; padding:12px; background:var(--description-bg); border-radius:10px;
+            font-size:13px; color:var(--description-text); text-align:center; position:relative;
+        }
+        .description-edit { position:absolute; top:6px; right:10px; font-size:14px; color:var(--info-label); cursor:pointer; }
+        .logout-btn {
+            margin-top:16px; width:100%; padding:12px; border:1px solid var(--btn-danger-border);
+            border-radius:12px; background:var(--btn-danger-bg); color:var(--btn-danger-text);
+            font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s;
+        }
+        .logout-btn:active { background:#fef0f0; }
+        .tab { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+        .tab button {
+            flex:1; padding:10px 4px; min-height:38px; border:none; background:var(--tab-bg);
+            color:var(--tab-text); font-size:11px; font-weight:500; cursor:pointer; border-radius:10px;
+            transition:all 0.2s; white-space:nowrap; -webkit-tap-highlight-color:transparent;
+            user-select:none; display:flex; align-items:center; justify-content:center;
+        }
+        .tab button.active { background:var(--tab-active-bg); color:var(--tab-active-text); }
+        .tab-content { flex:1; overflow-y:auto; padding-top:8px; }
+        .setting-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid var(--border-color); }
+        .setting-label { font-size:14px; color:var(--text); }
+        .setting-control { display:flex; align-items:center; gap:8px; }
+        .toggle { width:44px; height:26px; border-radius:13px; background:var(--toggle-bg); position:relative; cursor:pointer; transition:background 0.3s; }
+        .toggle.active { background:var(--toggle-active); }
+        .toggle::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:left 0.3s; }
+        .toggle.active::after { left:21px; }
+        .color-dot { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all 0.2s; }
+        .color-dot:hover { transform:scale(1.2); }
+        .color-dot.active { border-color:var(--text); }
+        .select-row { display:flex; gap:6px; flex-wrap:wrap; }
+        .select-option {
+            padding:5px 12px; border-radius:16px; font-size:11px; cursor:pointer;
+            border:1px solid var(--select-option-border); background:var(--select-option-bg);
+            color:var(--text); transition:all 0.2s;
+        }
+        .select-option.active { background:var(--select-option-active-bg); color:var(--select-option-active-text); border-color:var(--select-option-active-bg); }
+        .friends-tabs { display:flex; gap:8px; margin-bottom:12px; }
+        .friends-tabs button {
+            flex:1; padding:8px 4px; border:none; border-radius:10px; background:var(--tab-bg);
+            color:var(--tab-text); font-size:12px; font-weight:500; cursor:pointer; transition:all 0.2s;
+        }
+        .friends-tabs button.active { background:var(--tab-active-bg); color:var(--tab-active-text); }
+        .friend-card {
+            display:flex; align-items:center; justify-content:space-between; padding:10px 12px;
+            background:var(--card-bg); border-radius:12px; border:1px solid var(--border-color);
+            margin-bottom:8px; transition:transform 0.2s, box-shadow 0.2s;
+        }
+        .friend-card:hover { transform:translateX(4px); box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+        .friend-card .f-avatar { width:36px; height:36px; border-radius:50%; margin-right:10px; flex-shrink:0; background:var(--input-bg); }
+        .friend-card .f-info { flex:1; display:flex; flex-direction:column; }
+        .friend-card .f-name { font-size:14px; font-weight:600; color:var(--text); }
+        .friend-card .f-tag { font-size:11px; color:var(--info-label); }
+        .friend-card .f-elo {
+            background:rgba(0,0,0,0.25); backdrop-filter:blur(4px); border-radius:20px; padding:2px 12px;
+            font-size:13px; font-weight:600; color:var(--text); margin-left:8px; flex-shrink:0;
+        }
+        .friend-card .f-actions { display:flex; gap:6px; margin-left:8px; }
+        .friend-card .f-actions button {
+            width:28px; height:28px; border-radius:50%; border:none; background:var(--tab-bg);
+            color:var(--text); font-size:14px; cursor:pointer; transition:all 0.2s;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .friend-card .f-actions button.accept { background:var(--success-color); color:#fff; }
+        .friend-card .f-actions button.reject { background:var(--error-color); color:#fff; }
+        .friend-card .f-actions button.remove { background:rgba(0,0,0,0.2); backdrop-filter:blur(4px); color:var(--error-color); font-size:16px; }
+        .friend-card .f-actions button:hover { transform:scale(1.1); }
+        .friend-card .f-actions button.add-btn {
+            background:var(--btn-primary-bg); color:var(--btn-primary-text); width:auto;
+            padding:4px 14px; border-radius:20px; font-size:12px; font-weight:600;
+        }
+        .search-input { margin-bottom:12px; }
+        .search-results { margin-top:8px; }
+        .leaderboard-list { margin-top:12px; display:flex; flex-direction:column; gap:10px; }
         .lb-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.25);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            transition: transform 0.2s, box-shadow 0.3s;
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            overflow: hidden;
-            min-height: 60px;
-            animation: slideDown 0.5s ease-out both;
+            display:flex; align-items:center; justify-content:space-between; padding:10px 14px;
+            border-radius:16px; border:1px solid rgba(255,255,255,0.25); box-shadow:0 4px 12px rgba(0,0,0,0.06);
+            transition:transform 0.2s, box-shadow 0.3s; cursor:pointer; background-size:cover;
+            background-position:center; position:relative; overflow:hidden; min-height:60px;
+            animation:slideDown 0.5s ease-out both;
         }
-        .lb-row:hover { transform: translateX(6px) scale(1.01); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        .lb-row:hover { transform:translateX(6px) scale(1.01); box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-30px);} to{opacity:1;transform:translateY(0);} }
         .lb-row .rank-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-weight: 800;
-            font-size: 14px;
-            color: #fff;
-            flex-shrink: 0;
-            margin-right: 8px;
-            position: relative;
-            z-index: 2;
+            display:flex; align-items:center; justify-content:center; width:32px; height:32px;
+            border-radius:50%; font-weight:800; font-size:14px; color:#fff; flex-shrink:0;
+            margin-right:8px; position:relative; z-index:2;
         }
-        .lb-row .rank-badge.gold { background: #ffd700; color: #000; }
-        .lb-row .rank-badge.silver { background: #c0c0c0; color: #000; }
-        .lb-row .rank-badge.bronze { background: #cd7f32; color: #fff; }
-        .lb-row .rank-badge.normal { background: rgba(0,0,0,0.3); color: #fff; }
-        .lb-row .avatar-wrap { position: relative; flex-shrink: 0; margin: 0 8px; z-index: 2; }
-        .lb-row .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 6px rgba(0,0,0,0.1); background: var(--input-bg); }
-        .lb-row .nick { flex: 1; font-weight: 600; font-size: 14px; color: #fff; margin: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 4px rgba(0,0,0,0.6); position: relative; z-index: 2; }
-        .lb-row .elo-group { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); border-radius: 20px; padding: 2px 12px; display: inline-flex; align-items: center; font-size: 13px; font-weight: 600; color: #fff; flex-shrink: 0; text-shadow: 0 1px 4px rgba(0,0,0,0.6); position: relative; z-index: 2; }
-        .lb-row.me { border-color: var(--link-color); }
-        .lb-row .glass-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(2px); z-index: 1; }
-        .my-rank-box { margin-top: 16px; padding: 12px 16px; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; animation: slideDown 0.5s ease-out; }
-        .my-rank-box .label { color: var(--info-label); font-size: 13px; }
-        .my-rank-box .rank { font-size: 20px; font-weight: 800; color: var(--text); }
-        .my-rank-box .avatar-small { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: var(--input-bg); }
-        .my-rank-box .nick-small { font-weight: 600; font-size: 14px; color: var(--text); margin: 0 8px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .my-rank-box .elo-small { font-weight: 600; font-size: 13px; color: var(--info-value); }
-
-        /* Модальные окна */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 20; }
-        .modal-overlay.visible { display: flex; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-content { background: var(--card-bg); border-radius: 20px; padding: 20px; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto; color: var(--text); animation: scaleIn 0.2s ease-out; }
-        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-content h2 { margin-bottom: 16px; text-align: center; }
-        .modal-banner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 16px; }
-        .modal-banner-item { background: var(--tab-bg); border: 2px solid var(--border-color); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 12px; color: var(--text); }
-        .modal-banner-item:hover { border-color: var(--link-color); transform: scale(1.05); }
-        .modal-banner-item.selected { border-color: var(--link-color); background: rgba(233,69,96,0.1); }
-        .modal-banner-item .preview { width: 100%; height: 60px; border-radius: 8px; background-size: cover; background-position: center; margin-bottom: 4px; }
-        .modal-banner-item .label { font-weight: 500; }
-        .modal-close-btn { margin-top: 12px; width: 100%; }
-        .modal-banner-item.custom .edit-icon { display: inline-block; cursor: pointer; font-size: 12px; margin-left: 4px; background: transparent; color: var(--text); }
-        .modal-banner-item.custom .edit-icon.hidden { display: none; }
-
-        /* Профиль игрока (модальное) */
-        .profile-modal .modal-content { max-width: 350px; padding: 0; overflow: hidden; background: var(--card-bg); }
-        .profile-modal .modal-banner { width: 100%; height: 100px; background-size: cover; background-position: center; position: relative; }
-        .profile-modal .modal-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fff; margin: -40px auto 0; background: var(--input-bg); object-fit: cover; position: relative; z-index: 2; }
-        .profile-modal .modal-profile-info { padding: 12px 16px 16px; text-align: center; }
-        .profile-modal .p-name { font-size: 18px; font-weight: bold; color: var(--text); }
-        .profile-modal .p-tag { font-size: 13px; color: var(--info-label); }
-        .profile-modal .p-description { margin-top: 8px; font-size: 13px; color: var(--description-text); background: var(--description-bg); border-radius: 8px; padding: 6px 12px; }
-        .profile-modal .p-stats { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text); align-items: center; }
-        .profile-modal .p-stats .stat-row { display: flex; justify-content: space-between; width: 100%; padding: 2px 0; border-bottom: 1px solid var(--border-color); }
-        .profile-modal .p-stats .stat-row:last-child { border-bottom: none; }
-        .profile-modal .p-stats .stat-label { color: var(--info-label); }
-        .profile-modal .p-stats .stat-value { font-weight: 500; color: var(--info-value); }
-        .profile-modal .close-btn { margin-top: 12px; width: 100%; }
-
-        /* ===== ПОИСК (турниры + комнаты + чат) ===== */
-        .search-container {
-            padding: 4px 0;
+        .lb-row .rank-badge.gold { background:#ffd700; color:#000; }
+        .lb-row .rank-badge.silver { background:#c0c0c0; color:#000; }
+        .lb-row .rank-badge.bronze { background:#cd7f32; color:#fff; }
+        .lb-row .rank-badge.normal { background:rgba(0,0,0,0.3); color:#fff; }
+        .lb-row .avatar-wrap { position:relative; flex-shrink:0; margin:0 8px; z-index:2; }
+        .lb-row .avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.8); box-shadow:0 2px 6px rgba(0,0,0,0.1); background:var(--input-bg); }
+        .lb-row .nick { flex:1; font-weight:600; font-size:14px; color:#fff; margin:0 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 1px 4px rgba(0,0,0,0.6); position:relative; z-index:2; }
+        .lb-row .elo-group {
+            background:rgba(0,0,0,0.4); backdrop-filter:blur(4px); border-radius:20px; padding:2px 12px;
+            display:inline-flex; align-items:center; font-size:13px; font-weight:600; color:#fff;
+            flex-shrink:0; text-shadow:0 1px 4px rgba(0,0,0,0.6); position:relative; z-index:2;
         }
-        .search-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+        .lb-row.me { border-color:var(--link-color); }
+        .lb-row .glass-overlay { position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(2px); z-index:1; }
+        .my-rank-box {
+            margin-top:16px; padding:12px 16px; background:rgba(255,255,255,0.7); backdrop-filter:blur(10px);
+            -webkit-backdrop-filter:blur(10px); border-radius:16px; border:1px solid rgba(255,255,255,0.3);
+            box-shadow:0 2px 8px rgba(0,0,0,0.05); display:flex; align-items:center;
+            justify-content:space-between; animation:slideDown 0.5s ease-out;
         }
-        .search-header h2 {
-            font-size: 20px;
-            color: var(--text);
+        .my-rank-box .label { color:var(--info-label); font-size:13px; }
+        .my-rank-box .rank { font-size:20px; font-weight:800; color:var(--text); }
+        .my-rank-box .avatar-small { width:32px; height:32px; border-radius:50%; object-fit:cover; background:var(--input-bg); }
+        .my-rank-box .nick-small { font-weight:600; font-size:14px; color:var(--text); margin:0 8px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .my-rank-box .elo-small { font-weight:600; font-size:13px; color:var(--info-value); }
+        .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:20; }
+        .modal-overlay.visible { display:flex; animation:fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .modal-content {
+            background:var(--card-bg); border-radius:20px; padding:20px; max-width:400px; width:90%;
+            max-height:80vh; overflow-y:auto; color:var(--text); animation:scaleIn 0.2s ease-out;
         }
-
-        /* Карточки турниров с анимацией цветов */
-        .tournament-cards {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
+        @keyframes scaleIn { from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+        .modal-content h2 { margin-bottom:16px; text-align:center; }
+        .modal-banner-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:10px; margin-bottom:16px; }
+        .modal-banner-item {
+            background:var(--tab-bg); border:2px solid var(--border-color); border-radius:12px; padding:8px;
+            text-align:center; cursor:pointer; transition:all 0.2s; font-size:12px; color:var(--text);
         }
+        .modal-banner-item:hover { border-color:var(--link-color); transform:scale(1.05); }
+        .modal-banner-item.selected { border-color:var(--link-color); background:rgba(233,69,96,0.1); }
+        .modal-banner-item .preview { width:100%; height:60px; border-radius:8px; background-size:cover; background-position:center; margin-bottom:4px; }
+        .modal-banner-item .label { font-weight:500; }
+        .modal-close-btn { margin-top:12px; width:100%; }
+        .modal-banner-item.custom .edit-icon { display:inline-block; cursor:pointer; font-size:12px; margin-left:4px; background:transparent; color:var(--text); }
+        .modal-banner-item.custom .edit-icon.hidden { display:none; }
+        .profile-modal .modal-content { max-width:350px; padding:0; overflow:hidden; background:var(--card-bg); }
+        .profile-modal .modal-banner { width:100%; height:100px; background-size:cover; background-position:center; position:relative; }
+        .profile-modal .modal-avatar { width:80px; height:80px; border-radius:50%; border:3px solid #fff; margin:-40px auto 0; background:var(--input-bg); object-fit:cover; position:relative; z-index:2; }
+        .profile-modal .modal-profile-info { padding:12px 16px 16px; text-align:center; }
+        .profile-modal .p-name { font-size:18px; font-weight:bold; color:var(--text); }
+        .profile-modal .p-tag { font-size:13px; color:var(--info-label); }
+        .profile-modal .p-description { margin-top:8px; font-size:13px; color:var(--description-text); background:var(--description-bg); border-radius:8px; padding:6px 12px; }
+        .profile-modal .p-stats { margin-top:8px; display:flex; flex-direction:column; gap:4px; font-size:13px; color:var(--text); align-items:center; }
+        .profile-modal .p-stats .stat-row { display:flex; justify-content:space-between; width:100%; padding:2px 0; border-bottom:1px solid var(--border-color); }
+        .profile-modal .p-stats .stat-row:last-child { border-bottom:none; }
+        .profile-modal .p-stats .stat-label { color:var(--info-label); }
+        .profile-modal .p-stats .stat-value { font-weight:500; color:var(--info-value); }
+        .profile-modal .close-btn { margin-top:12px; width:100%; }
+        .search-container { padding:4px 0; }
+        .search-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .search-header h2 { font-size:20px; color:var(--text); }
+        .tournament-cards { display:flex; gap:12px; margin-bottom:20px; }
         .tournament-card {
-            flex: 1;
-            padding: 20px 16px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 2px solid var(--border-color);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            animation: none;
+            flex:1; padding:20px 16px; background:var(--card-bg); border-radius:16px;
+            border:2px solid var(--border-color); text-align:center; cursor:pointer;
+            transition:all 0.2s; box-shadow:var(--card-shadow); position:relative; animation:none;
         }
-        .tournament-card:hover {
-            border-color: var(--link-color);
-            transform: translateY(-2px);
-        }
-        .tournament-card:active {
-            transform: scale(0.97);
-        }
-        .tournament-card .title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text);
-        }
-        .tournament-card .sub {
-            font-size: 12px;
-            color: var(--info-label);
-            margin-top: 4px;
-        }
-        .tournament-card .arrow {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: var(--info-label);
-            opacity: 0.6;
-        }
-        .tournament-card.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            border-color: var(--border-color);
-        }
-        .tournament-card.disabled:hover {
-            transform: none;
-            border-color: var(--border-color);
-        }
-
-        /* Анимация цветов для 3x3 */
-        .tournament-card.type-3x3 {
-            animation: colorCycle3x3 4s infinite alternate;
-        }
+        .tournament-card:hover { border-color:var(--link-color); transform:translateY(-2px); }
+        .tournament-card:active { transform:scale(0.97); }
+        .tournament-card .title { font-size:16px; font-weight:700; color:var(--text); }
+        .tournament-card .sub { font-size:12px; color:var(--info-label); margin-top:4px; }
+        .tournament-card .arrow { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:20px; color:var(--info-label); opacity:0.6; }
+        .tournament-card.disabled { opacity:0.5; cursor:not-allowed; border-color:var(--border-color); }
+        .tournament-card.disabled:hover { transform:none; border-color:var(--border-color); }
+        .tournament-card.type-3x3 { animation:colorCycle3x3 4s infinite alternate; }
         @keyframes colorCycle3x3 {
-            0% { background-color: #ff8c00; }
-            20% { background-color: #9b59b6; }
-            40% { background-color: #e91e63; }
-            60% { background-color: #ffeb3b; }
-            80% { background-color: #03a9f4; }
-            100% { background-color: #ff8c00; }
+            0%{background-color:#ff8c00;} 20%{background-color:#9b59b6;} 40%{background-color:#e91e63;}
+            60%{background-color:#ffeb3b;} 80%{background-color:#03a9f4;} 100%{background-color:#ff8c00;}
         }
-
-        /* Анимация цветов для ШД (зеленые оттенки) */
-        .tournament-card.type-sd {
-            animation: colorCycleSD 4s infinite alternate;
-        }
+        .tournament-card.type-sd { animation:colorCycleSD 4s infinite alternate; }
         @keyframes colorCycleSD {
-            0% { background-color: #2e7d32; }
-            25% { background-color: #388e3c; }
-            50% { background-color: #4caf50; }
-            75% { background-color: #81c784; }
-            100% { background-color: #a5d6a7; }
+            0%{background-color:#2e7d32;} 25%{background-color:#388e3c;} 50%{background-color:#4caf50;}
+            75%{background-color:#81c784;} 100%{background-color:#a5d6a7;}
         }
-
-        /* Комнаты: эффект стекла */
-        .rooms-section {
-            margin-top: 12px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 16px;
-        }
-        .rooms-section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--info-label);
-            margin-bottom: 12px;
-        }
+        .rooms-section { margin-top:12px; border-top:1px solid var(--border-color); padding-top:16px; }
+        .rooms-section-title { font-size:14px; font-weight:600; color:var(--info-label); margin-bottom:12px; }
         .rooms-glass {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            color: var(--text);
+            background:rgba(255,255,255,0.15); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+            border-radius:20px; padding:16px; border:1px solid rgba(255,255,255,0.2);
+            box-shadow:0 8px 32px rgba(0,0,0,0.08); color:var(--text);
         }
-        .rooms-glass.dark {
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(12px);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .rooms-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .rooms-actions .btn {
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 13px;
-        }
-        .rooms-actions .btn-primary {
-            background: var(--btn-primary-bg);
-            color: var(--btn-primary-text);
-        }
-        .rooms-actions .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text);
-        }
-        .rooms-actions .btn-danger {
-            background: var(--btn-danger-bg);
-            color: var(--btn-danger-text);
-            border: 1px solid var(--btn-danger-border);
-        }
-        .rooms-actions .btn-success {
-            background: var(--success-color);
-            color: #fff;
-        }
-
-        .members-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .rooms-glass.dark { background:rgba(0,0,0,0.2); backdrop-filter:blur(12px); border-color:rgba(255,255,255,0.1); }
+        .rooms-actions { display:flex; flex-direction:column; gap:8px; }
+        .rooms-actions .btn { padding:10px 14px; border-radius:12px; font-weight:600; font-size:13px; }
+        .rooms-actions .btn-primary { background:var(--btn-primary-bg); color:var(--btn-primary-text); }
+        .rooms-actions .btn-outline { background:transparent; border:1px solid var(--border-color); color:var(--text); }
+        .rooms-actions .btn-danger { background:var(--btn-danger-bg); color:var(--btn-danger-text); border:1px solid var(--btn-danger-border); }
+        .rooms-actions .btn-success { background:var(--success-color); color:#fff; }
+        .members-list { display:flex; flex-direction:column; gap:4px; }
         .member-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 8px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(4px);
+            display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:10px;
+            background:rgba(255,255,255,0.1); backdrop-filter:blur(4px);
         }
         .member-item .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--input-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 13px;
-            color: #fff;
-            position: relative;
+            width:32px; height:32px; border-radius:50%; background:var(--input-bg); display:flex;
+            align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; position:relative;
         }
-        .member-item .avatar .crown {
-            position: absolute;
-            bottom: -4px;
-            left: -4px;
-            font-size: 14px;
-            color: #ffd700;
-        }
-        .member-item .member-name {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-        }
-        .member-item .member-tag {
-            font-size: 10px;
-            color: var(--info-label);
-        }
-
-        /* Код комнаты (всегда виден) */
+        .member-item .avatar .crown { position:absolute; bottom:-4px; left:-4px; font-size:14px; color:#ffd700; }
+        .member-item .member-name { font-size:13px; font-weight:500; color:var(--text); }
+        .member-item .member-tag { font-size:10px; color:var(--info-label); }
         .room-code-block {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(4px);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.2);
+            display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;
+            padding:8px 12px; background:rgba(255,255,255,0.1); backdrop-filter:blur(4px);
+            border-radius:12px; border:1px solid rgba(255,255,255,0.2);
         }
-        .room-code-block .code-label {
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--info-label);
-        }
-        .room-code-block .code {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--link-color);
-            font-family: monospace;
-        }
-        .room-code-block .btn {
-            width: auto;
-            padding: 6px 16px;
-            font-size: 12px;
-            border-radius: 20px;
-            margin-left: auto;
-        }
-
-        /* Чат */
+        .room-code-block .code-label { font-weight:600; font-size:13px; color:var(--info-label); }
+        .room-code-block .code { font-size:18px; font-weight:700; letter-spacing:1px; color:var(--link-color); font-family:monospace; }
+        .room-code-block .btn { width:auto; padding:6px 16px; font-size:12px; border-radius:20px; margin-left:auto; }
         .chat-area {
-            margin-top: 12px;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.15);
+            margin-top:12px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px;
+            border:1px solid rgba(255,255,255,0.15);
         }
-        .chat-area .chat-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--info-label);
-            margin-bottom: 8px;
-        }
-        .chat-area .chat-messages {
-            max-height: 150px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-bottom: 8px;
-        }
-        .chat-area .chat-messages .msg {
-            font-size: 13px;
-            color: var(--text);
-            padding: 2px 0;
-        }
-        .chat-area .chat-messages .msg .sender {
-            font-weight: 600;
-            color: var(--link-color);
-        }
-        .chat-area .chat-input-row {
-            display: flex;
-            gap: 8px;
-        }
+        .chat-area .chat-title { font-size:13px; font-weight:600; color:var(--info-label); margin-bottom:8px; }
+        .chat-area .chat-messages { max-height:150px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+        .chat-area .chat-messages .msg { font-size:13px; color:var(--text); padding:2px 0; }
+        .chat-area .chat-messages .msg .sender { font-weight:600; color:var(--link-color); }
+        .chat-area .chat-input-row { display:flex; gap:8px; }
         .chat-area .chat-input-row input {
-            flex: 1;
-            padding: 6px 12px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            background: rgba(255,255,255,0.1);
-            color: var(--text);
-            outline: none;
-            font-size: 13px;
+            flex:1; padding:6px 12px; border:1px solid rgba(255,255,255,0.2); border-radius:20px;
+            background:rgba(255,255,255,0.1); color:var(--text); outline:none; font-size:13px;
         }
-        .chat-area .chat-input-row input:focus {
-            border-color: var(--link-color);
-        }
+        .chat-area .chat-input-row input:focus { border-color:var(--link-color); }
         .chat-area .chat-input-row button {
-            padding: 6px 16px;
-            border: none;
-            border-radius: 20px;
-            background: var(--btn-primary-bg);
-            color: var(--btn-primary-text);
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
+            padding:6px 16px; border:none; border-radius:20px; background:var(--btn-primary-bg);
+            color:var(--btn-primary-text); font-weight:600; font-size:12px; cursor:pointer;
         }
-
-        /* Модалка ввода кода комнаты — теперь с переменными темы */
         .modal-overlay.rooms-modal .modal-box {
-            background: var(--modal-bg);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 24px 28px;
-            max-width: 360px;
-            width: 90%;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            color: var(--text);
+            background:var(--modal-bg); backdrop-filter:blur(20px); border-radius:20px; padding:24px 28px;
+            max-width:360px; width:90%; border:1px solid var(--border-color); box-shadow:0 20px 60px rgba(0,0,0,0.4);
+            color:var(--text);
         }
-        .modal-overlay.rooms-modal .modal-box h3 {
-            font-size: 18px;
-            margin-bottom: 14px;
-            text-align: center;
-            color: var(--text);
-        }
+        .modal-overlay.rooms-modal .modal-box h3 { font-size:18px; margin-bottom:14px; text-align:center; color:var(--text); }
         .modal-overlay.rooms-modal .modal-box input {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background: var(--input-bg);
-            color: var(--text);
-            font-size: 16px;
-            text-align: center;
-            letter-spacing: 2px;
-            font-family: monospace;
-            outline: none;
-            transition: 0.2s;
+            width:100%; padding:10px 14px; border:1px solid var(--border-color); border-radius:12px;
+            background:var(--input-bg); color:var(--text); font-size:16px; text-align:center;
+            letter-spacing:2px; font-family:monospace; outline:none; transition:0.2s;
         }
-        .modal-overlay.rooms-modal .modal-box input:focus {
-            border-color: var(--link-color);
-        }
-        .modal-overlay.rooms-modal .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
+        .modal-overlay.rooms-modal .modal-box input:focus { border-color:var(--link-color); }
+        .modal-overlay.rooms-modal .modal-actions { display:flex; gap:10px; margin-top:16px; }
         .modal-overlay.rooms-modal .modal-actions button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.2s;
+            flex:1; padding:10px; border:none; border-radius:12px; font-weight:600; font-size:13px; cursor:pointer; transition:0.2s;
         }
-        .modal-overlay.rooms-modal .modal-actions .btn-primary {
-            background: var(--btn-primary-bg);
-            color: var(--btn-primary-text);
+        .modal-overlay.rooms-modal .modal-actions .btn-primary { background:var(--btn-primary-bg); color:var(--btn-primary-text); }
+        .modal-overlay.rooms-modal .modal-actions .btn-secondary { background:var(--tab-bg); color:var(--tab-text); }
+        @media (max-width:480px) {
+            .tournament-cards { flex-direction:column; }
+            .room-code-block { flex-wrap:wrap; }
+            .room-code-block .btn { margin-left:0; }
         }
-        .modal-overlay.rooms-modal .modal-actions .btn-secondary {
-            background: var(--tab-bg);
-            color: var(--tab-text);
-        }
-
-        @media (max-width: 480px) {
-            .tournament-cards {
-                flex-direction: column;
-            }
-            .room-code-block {
-                flex-wrap: wrap;
-            }
-            .room-code-block .btn {
-                margin-left: 0;
-            }
-        }
-
-        /* Анимация только для вкладок (контейнер) */
-        .tab-content-inner {
-            animation: slideDown 0.5s ease-out both;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .tab-content-inner { animation:slideDown 0.5s ease-out both; }
+        /* battle list styles (не включены в ваш CSS, но используются в renderBattles) */
+        .battle-list { display:flex; flex-direction:column; gap:10px; padding-bottom:12px; }
+        .battle-card { border-radius:12px; padding:12px; color:#fff; min-height:140px; display:flex; flex-direction:column; justify-content:space-between; background-size:cover; background-position:center; }
+        .battle-header { display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:6px; }
+        .battle-mode { font-weight:700; }
+        .battle-teams { display:flex; justify-content:space-between; align-items:center; margin:6px 0; }
+        .team { display:flex; gap:6px; flex:1; flex-wrap:wrap; }
+        .team.right { justify-content:flex-end; }
+        .team-player { display:flex; flex-direction:column; align-items:center; font-size:10px; cursor:pointer; transition:transform 0.2s; }
+        .team-player:hover { transform:scale(1.1); }
+        .team-player .mini-avatar { width:30px; height:30px; border-radius:50%; object-fit:cover; margin-bottom:2px; background:var(--input-bg); border:1px solid rgba(255,255,255,0.3); }
+        .team-player .nick { max-width:40px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.5); }
+        .vs-label { font-weight:700; font-size:12px; text-shadow:0 1px 3px rgba(0,0,0,0.5); }
+        .battle-rounds { margin-top:6px; border-top:1px solid rgba(255,255,255,0.3); padding-top:6px; }
+        .round { display:flex; justify-content:space-between; font-size:12px; padding:2px 0; }
+        .round .round-content { background:rgba(0,0,0,0.25); backdrop-filter:blur(2px); border-radius:8px; padding:2px 8px; display:inline-flex; align-items:center; gap:12px; }
+        .round .r-result.win { color:#4CAF50; }
+        .round .r-result.loss { color:#f44336; }
+        .round .r-time { color:rgba(255,255,255,0.8); }
+        .battle-footer { display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:4px; border-top:1px solid rgba(255,255,255,0.2); }
+        .battle-footer .battle-result { font-weight:700; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); border-radius:20px; padding:4px 12px; font-size:13px; }
+        .battle-footer .battle-result.win { color:#4CAF50; }
+        .battle-footer .battle-result.loss { color:#f44336; }
+        .battle-footer .battle-time { font-size:11px; opacity:0.7; }
     </style>
 </head>
 <body>
@@ -754,25 +442,15 @@
             <a onclick="showLogin()" data-i18n="remember_password">Вспомнили пароль? Войти</a>
         </div>
     </div>
-
-    <!-- Экран верификации клана (добавлен) -->
     <div id="verifyScreen" class="auth-card hidden">
         <div style="text-align:center;">
             <h2>Подтверждение аккаунта</h2>
-            <p style="margin:16px 0;font-size:14px;color:var(--text);">
-                Вступите в клан <strong>ESBrawlverify</strong><br>
-                Минимальный порог: <strong>15000</strong> кубков
-            </p>
-            <p style="font-size:13px;color:var(--info-label);margin-bottom:20px;">
-                После вступления нажмите кнопку ниже.
-            </p>
+            <p style="margin:16px 0;font-size:14px;color:var(--text);">Вступите в клан <strong>ESBrawlverify</strong><br>Минимальный порог: <strong>15000</strong> кубков</p>
+            <p style="font-size:13px;color:var(--info-label);margin-bottom:20px;">После вступления нажмите кнопку ниже.</p>
             <button class="btn primary" id="verifyBtn">Я вступил в клан</button>
-            <p style="margin-top:16px;font-size:12px;color:var(--info-label);">
-                Пока не подтвердите, рейтинговые игры недоступны.
-            </p>
+            <p style="margin-top:16px;font-size:12px;color:var(--info-label);">Пока не подтвердите, рейтинговые игры недоступны.</p>
         </div>
     </div>
-
     <!-- Главный экран -->
     <div id="mainScreen" class="main-screen hidden">
         <div class="tab">
@@ -785,8 +463,7 @@
         </div>
         <div id="tabContent" class="tab-content"></div>
     </div>
-
-    <!-- Модальное окно выбора баннеров -->
+    <!-- Модальные окна -->
     <div id="bannerModal" class="modal-overlay">
         <div class="modal-content">
             <h2 data-i18n="banner_choose">Выберите баннер</h2>
@@ -794,8 +471,6 @@
             <button class="btn primary modal-close-btn" onclick="closeBannerModal()" data-i18n="close">Закрыть</button>
         </div>
     </div>
-
-    <!-- Модальное окно профиля игрока -->
     <div id="profileModal" class="modal-overlay profile-modal">
         <div class="modal-content">
             <div class="modal-banner" id="modalBanner" style="background: linear-gradient(135deg, #e94560, #c0392b);"></div>
@@ -812,328 +487,149 @@
 
     <script>
         // ===== Telegram WebApp =====
-        let tg = null;
-        if (window.Telegram && window.Telegram.WebApp) {
-            tg = window.Telegram.WebApp;
-            tg.expand();
-        }
+        const tg = window.Telegram?.WebApp;
+        if (tg) tg.expand();
 
         // ===== Данные пользователя =====
         let userData = null;
-        let userSettings = {
-            language: 'ru',
-            theme: 'light',
-            sound: true,
-            notifications: true,
-            colorTheme: '#e94560'
-        };
-
-        // ---- ДАННЫЕ ДРУЗЕЙ ----
-        let allUsers = [];
-        let friends = [];
-        let friendRequests = [];
-        let sentRequests = [];
-
-        // ---- КОМНАТЫ ----
-        let rooms = [];
+        let userSettings = { language:'ru', theme:'light', sound:true, notifications:true, colorTheme:'#e94560' };
         let currentRoomId = null;
+        let chatInterval = null;
 
-        const currentPlayer = {
-            name: 'Adykat',
-            tag: '#RQ02QQ8V0',
-            avatarColor: 'hsl(0,70%,60%)'
+        // ===== API (все вызовы реальные) =====
+        const api = {
+            login: (login, password) => fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login, password}) }).then(r=>r.json()),
+            register: (nickname, tag, email, password) => fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({nickname, tag, email, password}) }).then(r=>r.json()),
+            verifyClub: (tag, user_id) => fetch('/api/verify-club', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tag, user_id}) }).then(r=>r.json()),
+            changePassword: (user_id, old_password, new_password) => fetch('/api/change-password', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, old_password, new_password}) }).then(r=>r.json()),
+            updateProfile: (user_id, fields) => fetch('/api/profile', { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, ...fields}) }).then(r=>r.json()),
+            getProfile: (user_id) => fetch(`/api/profile?user_id=${user_id}`).then(r=>r.json()),
+            getLeaderboard: (limit=100) => fetch(`/api/leaderboard?limit=${limit}`).then(r=>r.json()),
+            getFriends: (user_id) => fetch(`/api/friends?user_id=${user_id}`).then(r=>r.json()),
+            getFriendRequests: (user_id) => fetch(`/api/friend-requests?user_id=${user_id}`).then(r=>r.json()),
+            sendFriendRequest: (from_user_id, to_user_id) => fetch('/api/friend-request', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({from_user_id, to_user_id}) }).then(r=>r.json()),
+            acceptFriendRequest: (request_id) => fetch('/api/friend-request/accept', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({request_id}) }).then(r=>r.json()),
+            rejectFriendRequest: (request_id) => fetch('/api/friend-request/reject', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({request_id}) }).then(r=>r.json()),
+            removeFriend: (user_id, friend_id) => fetch('/api/friends', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, friend_id}) }).then(r=>r.json()),
+            createRoom: (user_id) => fetch('/api/rooms', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id}) }).then(r=>r.json()),
+            joinRoom: (user_id, code) => fetch('/api/rooms/join', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, code}) }).then(r=>r.json()),
+            leaveRoom: (user_id, room_id) => fetch('/api/rooms/leave', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, room_id}) }).then(r=>r.json()),
+            disbandRoom: (user_id, room_id) => fetch('/api/rooms', { method:'DELETE', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, room_id}) }).then(r=>r.json()),
+            getRoom: (room_id) => fetch(`/api/rooms/${room_id}`).then(r=>r.json()),
+            getMessages: (room_id, since=0) => fetch(`/api/messages?room_id=${room_id}&since=${since}`).then(r=>r.json()),
+            sendMessage: (room_id, user_id, text) => fetch('/api/messages', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({room_id, user_id, text}) }).then(r=>r.json()),
+            getBattles: (user_id) => fetch(`/api/battles?user_id=${user_id}`).then(r=>r.json()),
+            uploadAvatar: (user_id, formData) => fetch('/api/avatar', { method:'POST', body:formData }).then(r=>r.json()),
+            uploadBanner: (user_id, formData) => fetch('/api/banner', { method:'POST', body:formData }).then(r=>r.json()),
+            getBanners: () => fetch('/api/banners').then(r=>r.json()),
+            selectBanner: (user_id, banner_id) => fetch('/api/banner/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, banner_id}) }).then(r=>r.json()),
         };
 
+        // ===== Переводы (полные) =====
         const i18n = {
             ru: {
-                login_title: 'Вход',
-                login_btn: 'Войти',
-                no_account: 'У меня нет аккаунта',
-                forgot_password: 'Забыли пароль?',
-                register_title: 'Регистрация',
-                register_btn: 'Зарегистрироваться',
-                already_account: 'Уже есть аккаунт? Войти',
-                reset_title: 'Восстановление пароля',
-                reset_desc: 'Введите почту, привязанную к аккаунту',
-                reset_btn: 'Отправить код',
-                remember_password: 'Вспомнили пароль? Войти',
-                tab_profile: 'Профиль',
-                tab_battles: 'Лог боев',
-                tab_search: 'Поиск',
-                tab_leaderboard: 'Топ',
-                tab_friends: 'Друзья',
-                tab_settings: 'Настройки',
-                profile_no_data: 'Нет данных. Войдите в аккаунт.',
-                change_password: 'Сменить пароль',
-                change_password_title: 'Смена пароля',
-                old_password: 'Старый пароль',
-                new_password: 'Новый пароль',
-                repeat_password: 'Повторите пароль',
-                change_password_btn: 'Сменить пароль',
-                back: 'Назад',
-                password_changed: 'Пароль изменён',
-                fill_all: 'Заполните все поля',
-                min_6: 'Минимум 6 символов',
-                passwords_not_match: 'Пароли не совпадают',
-                settings_language: 'Язык',
-                settings_theme: 'Тема',
-                settings_sound: 'Звуки',
-                settings_notifications: 'Уведомления',
-                settings_color: 'Цветовая гамма',
-                theme_light: 'Светлая',
-                theme_dark: 'Тёмная',
-                lang_ru: 'Русский',
-                lang_en: 'English',
-                logout: 'Выйти из аккаунта',
-                edit_nickname: 'Введите новый никнейм (макс. 35 символов):',
-                edit_description: 'Введите описание профиля (макс. 1000 символов):',
-                description_empty: 'Описание отсутствует',
-                id: 'ID',
-                reg_date: 'Дата регистрации',
-                winrate: 'Винрейт',
-                games_played: 'Боев сыграно',
-                wins: 'Побед',
-                losses: 'Поражений',
-                account_not_found: 'Неправильный логин или пароль',
-                register_sent: 'Регистрация отправлена в бота!',
-                reset_sent: 'Код восстановления отправлен на ',
-                enter_email: 'Введите почту',
-                invalid_email: 'Некорректная почта',
-                tag_starts_with: 'Тег должен начинаться с #',
-                nickname_min: 'Никнейм должен быть от 3 символов',
-                password_min: 'Пароль должен быть от 6 символов',
-                battles_title: 'Лог последних боёв',
-                battle_mode: 'Режим',
-                battle_time: 'Время',
-                battle_players: 'Участники',
-                battle_result: 'Результат',
-                battle_win: 'ПОБЕДА',
-                battle_loss: 'ПОРАЖЕНИЕ',
-                vs: 'ПРОТИВ',
-                round: 'Раунд',
-                battle_click_profile: 'Нажмите, чтобы посмотреть профиль',
-                banner_choose: 'Выберите баннер',
-                close: 'Закрыть',
-                banner_static_1: 'Космос',
-                banner_static_2: 'Огонь',
-                banner_static_3: 'Лед',
-                banner_static_4: 'Трава',
-                banner_static_5: 'Неон',
-                banner_animated_1: 'Молнии',
-                banner_animated_2: 'Волны',
-                banner_animated_3: 'Пламя',
-                banner_animated_4: 'Звездопад',
-                banner_animated_5: 'Радуга',
-                banner_custom: 'Свой баннер',
-                select: 'Выбрать',
-                selected: 'Выбрано',
-                leaderboard_title: 'Топ игроков',
-                my_place: 'Моё место',
-                not_in_top: '—',
-                soon: 'скоро',
-                top_place: 'Место в топе',
-                mode_brawlball: 'Brawl Ball',
-                mode_gemgrab: 'Gem Grab',
-                mode_siege: 'Siege',
-                mode_hotzone: 'Hot Zone',
-                mode_heist: 'Heist',
-                profile_modal_title: 'Профиль игрока',
-                profile_modal_elo: 'ELO: {elo}',
-                profile_modal_wins: 'Побед: {wins}',
-                profile_modal_losses: 'Поражений: {losses}',
-                profile_modal_winrate: 'Винрейт: {winrate}%',
-                profile_modal_games: 'Боев сыграно: {games}',
-                profile_modal_regdate: 'Дата регистрации: {regdate}',
-                profile_modal_id: 'ID: {id}',
-                profile_modal_top: 'Место в топе: {top}',
-                // Друзья
-                friends_tab_my: 'Мои друзья',
-                friends_tab_requests: 'Заявки',
-                friends_tab_find: 'Найти',
-                friends_empty: 'Список пуст',
-                friends_add: 'Добавить',
-                friends_search_placeholder: 'Поиск по нику или тегу...',
-                friends_remove: 'Удалить',
-                friends_accept: 'Принять',
-                friends_reject: 'Отклонить',
-                friends_already_friend: 'Уже в друзьях',
-                friends_request_sent: 'Заявка отправлена',
-                // Поиск
-                search_title: 'Поиск',
-                search_3x3: 'Турниры 3x3',
-                search_sd: 'Турниры ШД',
-                search_3x3_desc: 'Командный турнир 3 на 3',
-                search_sd_desc: 'Одиночный турнир',
-                rooms_section: 'Комнаты',
-                rooms_create: 'Создать комнату',
-                rooms_join: 'Вступить в комнату',
-                rooms_leave: 'Выйти с комнаты',
-                rooms_disband: 'Расформировать комнату',
-                rooms_code: 'Код комнаты',
-                rooms_enter_code: 'Введите код комнаты',
-                rooms_confirm: 'Вступить',
-                rooms_cancel: 'Отмена',
-                rooms_no_rooms: 'Нет активных комнат',
-                rooms_not_in_room: 'Вы не в комнате',
-                rooms_full: 'Комната заполнена',
-                rooms_already_in: 'Вы уже в этой комнате',
-                rooms_room_not_found: 'Комната с таким кодом не найдена',
-                rooms_only_host: 'Только создатель может расформировать комнату',
-                rooms_ready: 'Готово',
-                rooms_ready_captain: 'Готово (капитан)',
-                rooms_ready_disabled: 'Только капитан может начать поиск',
-                rooms_search_started: 'Поиск турнира начат!',
-                chat_title: 'Чат комнаты',
-                chat_placeholder: 'Написать в чат...',
-                chat_send: 'Отправить'
+                login_title:'Вход', login_btn:'Войти', no_account:'У меня нет аккаунта', forgot_password:'Забыли пароль?',
+                register_title:'Регистрация', register_btn:'Зарегистрироваться', already_account:'Уже есть аккаунт? Войти',
+                reset_title:'Восстановление пароля', reset_desc:'Введите почту, привязанную к аккаунту', reset_btn:'Отправить код',
+                remember_password:'Вспомнили пароль? Войти',
+                tab_profile:'Профиль', tab_battles:'Лог боев', tab_search:'Поиск', tab_leaderboard:'Топ',
+                tab_friends:'Друзья', tab_settings:'Настройки',
+                profile_no_data:'Нет данных. Войдите в аккаунт.', change_password:'Сменить пароль',
+                change_password_title:'Смена пароля', old_password:'Старый пароль', new_password:'Новый пароль',
+                repeat_password:'Повторите пароль', change_password_btn:'Сменить пароль', back:'Назад',
+                password_changed:'Пароль изменён', fill_all:'Заполните все поля', min_6:'Минимум 6 символов',
+                passwords_not_match:'Пароли не совпадают',
+                settings_language:'Язык', settings_theme:'Тема', settings_sound:'Звуки', settings_notifications:'Уведомления',
+                settings_color:'Цветовая гамма', theme_light:'Светлая', theme_dark:'Тёмная', lang_ru:'Русский', lang_en:'English',
+                logout:'Выйти из аккаунта', edit_nickname:'Введите новый никнейм (макс. 35 символов):',
+                edit_description:'Введите описание профиля (макс. 1000 символов):', description_empty:'Описание отсутствует',
+                id:'ID', reg_date:'Дата регистрации', winrate:'Винрейт', games_played:'Боев сыграно', wins:'Побед',
+                losses:'Поражений', account_not_found:'Неправильный логин или пароль', register_sent:'Регистрация отправлена в бота!',
+                reset_sent:'Код восстановления отправлен на ', enter_email:'Введите почту', invalid_email:'Некорректная почта',
+                tag_starts_with:'Тег должен начинаться с #', nickname_min:'Никнейм должен быть от 3 символов',
+                password_min:'Пароль должен быть от 6 символов', battles_title:'Лог последних боёв', battle_mode:'Режим',
+                battle_time:'Время', battle_players:'Участники', battle_result:'Результат', battle_win:'ПОБЕДА',
+                battle_loss:'ПОРАЖЕНИЕ', vs:'ПРОТИВ', round:'Раунд', battle_click_profile:'Нажмите, чтобы посмотреть профиль',
+                banner_choose:'Выберите баннер', close:'Закрыть', banner_static_1:'Космос', banner_static_2:'Огонь',
+                banner_static_3:'Лед', banner_static_4:'Трава', banner_static_5:'Неон', banner_animated_1:'Молнии',
+                banner_animated_2:'Волны', banner_animated_3:'Пламя', banner_animated_4:'Звездопад', banner_animated_5:'Радуга',
+                banner_custom:'Свой баннер', select:'Выбрать', selected:'Выбрано', leaderboard_title:'Топ игроков',
+                my_place:'Моё место', not_in_top:'—', soon:'скоро', top_place:'Место в топе',
+                mode_brawlball:'Brawl Ball', mode_gemgrab:'Gem Grab', mode_siege:'Siege', mode_hotzone:'Hot Zone',
+                mode_heist:'Heist', profile_modal_title:'Профиль игрока', profile_modal_elo:'ELO: {elo}',
+                profile_modal_wins:'Побед: {wins}', profile_modal_losses:'Поражений: {losses}',
+                profile_modal_winrate:'Винрейт: {winrate}%', profile_modal_games:'Боев сыграно: {games}',
+                profile_modal_regdate:'Дата регистрации: {regdate}', profile_modal_id:'ID: {id}', profile_modal_top:'Место в топе: {top}',
+                friends_tab_my:'Мои друзья', friends_tab_requests:'Заявки', friends_tab_find:'Найти',
+                friends_empty:'Список пуст', friends_add:'Добавить', friends_search_placeholder:'Поиск по нику или тегу...',
+                friends_remove:'Удалить', friends_accept:'Принять', friends_reject:'Отклонить',
+                friends_already_friend:'Уже в друзьях', friends_request_sent:'Заявка отправлена',
+                search_title:'Поиск', search_3x3:'Турниры 3x3', search_sd:'Турниры ШД',
+                search_3x3_desc:'Командный турнир 3 на 3', search_sd_desc:'Одиночный турнир',
+                rooms_section:'Комнаты', rooms_create:'Создать комнату', rooms_join:'Вступить в комнату',
+                rooms_leave:'Выйти с комнаты', rooms_disband:'Расформировать комнату', rooms_code:'Код комнаты',
+                rooms_enter_code:'Введите код комнаты', rooms_confirm:'Вступить', rooms_cancel:'Отмена',
+                rooms_no_rooms:'Нет активных комнат', rooms_not_in_room:'Вы не в комнате', rooms_full:'Комната заполнена',
+                rooms_already_in:'Вы уже в этой комнате', rooms_room_not_found:'Комната с таким кодом не найдена',
+                rooms_only_host:'Только создатель может расформировать комнату', rooms_ready:'Готово',
+                rooms_ready_captain:'Готово (капитан)', rooms_ready_disabled:'Только капитан может начать поиск',
+                rooms_search_started:'Поиск турнира начат!', chat_title:'Чат комнаты', chat_placeholder:'Написать в чат...',
+                chat_send:'Отправить'
             },
             en: {
-                login_title: 'Login',
-                login_btn: 'Log in',
-                no_account: 'No account? Sign up',
-                forgot_password: 'Forgot password?',
-                register_title: 'Registration',
-                register_btn: 'Register',
-                already_account: 'Already have an account? Log in',
-                reset_title: 'Password recovery',
-                reset_desc: 'Enter the email linked to your account',
-                reset_btn: 'Send code',
-                remember_password: 'Remember password? Log in',
-                tab_profile: 'Profile',
-                tab_battles: 'Battle Log',
-                tab_search: 'Search',
-                tab_leaderboard: 'Leaderboard',
-                tab_friends: 'Friends',
-                tab_settings: 'Settings',
-                profile_no_data: 'No data. Log in to your account.',
-                change_password: 'Change password',
-                change_password_title: 'Change password',
-                old_password: 'Old password',
-                new_password: 'New password',
-                repeat_password: 'Repeat password',
-                change_password_btn: 'Change password',
-                back: 'Back',
-                password_changed: 'Password changed',
-                fill_all: 'Fill in all fields',
-                min_6: 'Minimum 6 characters',
-                passwords_not_match: 'Passwords do not match',
-                settings_language: 'Language',
-                settings_theme: 'Theme',
-                settings_sound: 'Sound',
-                settings_notifications: 'Notifications',
-                settings_color: 'Color theme',
-                theme_light: 'Light',
-                theme_dark: 'Dark',
-                lang_ru: 'Russian',
-                lang_en: 'English',
-                logout: 'Log out',
-                edit_nickname: 'Enter new nickname (max. 35 chars):',
-                edit_description: 'Enter profile description (max. 1000 chars):',
-                description_empty: 'No description',
-                id: 'ID',
-                reg_date: 'Registration date',
-                winrate: 'Winrate',
-                games_played: 'Games played',
-                wins: 'Wins',
-                losses: 'Losses',
-                account_not_found: 'Incorrect login or password',
-                register_sent: 'Registration sent to the bot!',
-                reset_sent: 'Recovery code sent to ',
-                enter_email: 'Enter your email',
-                invalid_email: 'Invalid email',
-                tag_starts_with: 'Tag must start with #',
-                nickname_min: 'Nickname must be at least 3 characters',
-                password_min: 'Password must be at least 6 characters',
-                battles_title: 'Last battles log',
-                battle_mode: 'Mode',
-                battle_time: 'Time',
-                battle_players: 'Players',
-                battle_result: 'Result',
-                battle_win: 'WIN',
-                battle_loss: 'LOSS',
-                vs: 'VS',
-                round: 'Round',
-                battle_click_profile: 'Tap to view profile',
-                banner_choose: 'Choose banner',
-                close: 'Close',
-                banner_static_1: 'Space',
-                banner_static_2: 'Fire',
-                banner_static_3: 'Ice',
-                banner_static_4: 'Grass',
-                banner_static_5: 'Neon',
-                banner_animated_1: 'Lightning',
-                banner_animated_2: 'Waves',
-                banner_animated_3: 'Flame',
-                banner_animated_4: 'Meteor',
-                banner_animated_5: 'Rainbow',
-                banner_custom: 'Custom banner',
-                select: 'Select',
-                selected: 'Selected',
-                leaderboard_title: 'Leaderboard',
-                my_place: 'My place',
-                not_in_top: '—',
-                soon: 'soon',
-                top_place: 'Top place',
-                mode_brawlball: 'Brawl Ball',
-                mode_gemgrab: 'Gem Grab',
-                mode_siege: 'Siege',
-                mode_hotzone: 'Hot Zone',
-                mode_heist: 'Heist',
-                profile_modal_title: 'Player Profile',
-                profile_modal_elo: 'ELO: {elo}',
-                profile_modal_wins: 'Wins: {wins}',
-                profile_modal_losses: 'Losses: {losses}',
-                profile_modal_winrate: 'Winrate: {winrate}%',
-                profile_modal_games: 'Games played: {games}',
-                profile_modal_regdate: 'Registration date: {regdate}',
-                profile_modal_id: 'ID: {id}',
-                profile_modal_top: 'Top place: {top}',
-                friends_tab_my: 'My friends',
-                friends_tab_requests: 'Requests',
-                friends_tab_find: 'Find',
-                friends_empty: 'List is empty',
-                friends_add: 'Add',
-                friends_search_placeholder: 'Search by nickname or tag...',
-                friends_remove: 'Remove',
-                friends_accept: 'Accept',
-                friends_reject: 'Reject',
-                friends_already_friend: 'Already friends',
-                friends_request_sent: 'Request sent',
-                search_title: 'Search',
-                search_3x3: 'Tournaments 3x3',
-                search_sd: 'Tournaments SD',
-                search_3x3_desc: 'Team tournament 3 vs 3',
-                search_sd_desc: 'Single tournament',
-                rooms_section: 'Rooms',
-                rooms_create: 'Create room',
-                rooms_join: 'Join room',
-                rooms_leave: 'Leave room',
-                rooms_disband: 'Disband room',
-                rooms_code: 'Room code',
-                rooms_enter_code: 'Enter room code',
-                rooms_confirm: 'Join',
-                rooms_cancel: 'Cancel',
-                rooms_no_rooms: 'No active rooms',
-                rooms_not_in_room: 'You are not in a room',
-                rooms_full: 'Room is full',
-                rooms_already_in: 'You are already in this room',
-                rooms_room_not_found: 'Room not found',
-                rooms_only_host: 'Only host can disband room',
-                rooms_ready: 'Ready',
-                rooms_ready_captain: 'Ready (captain)',
-                rooms_ready_disabled: 'Only captain can start search',
-                rooms_search_started: 'Tournament search started!',
-                chat_title: 'Room chat',
-                chat_placeholder: 'Type a message...',
-                chat_send: 'Send'
+                login_title:'Login', login_btn:'Log in', no_account:'No account? Sign up', forgot_password:'Forgot password?',
+                register_title:'Registration', register_btn:'Register', already_account:'Already have an account? Log in',
+                reset_title:'Password recovery', reset_desc:'Enter the email linked to your account', reset_btn:'Send code',
+                remember_password:'Remember password? Log in',
+                tab_profile:'Profile', tab_battles:'Battle Log', tab_search:'Search', tab_leaderboard:'Leaderboard',
+                tab_friends:'Friends', tab_settings:'Settings',
+                profile_no_data:'No data. Log in to your account.', change_password:'Change password',
+                change_password_title:'Change password', old_password:'Old password', new_password:'New password',
+                repeat_password:'Repeat password', change_password_btn:'Change password', back:'Back',
+                password_changed:'Password changed', fill_all:'Fill in all fields', min_6:'Minimum 6 characters',
+                passwords_not_match:'Passwords do not match',
+                settings_language:'Language', settings_theme:'Theme', settings_sound:'Sound', settings_notifications:'Notifications',
+                settings_color:'Color theme', theme_light:'Light', theme_dark:'Dark', lang_ru:'Russian', lang_en:'English',
+                logout:'Log out', edit_nickname:'Enter new nickname (max. 35 chars):',
+                edit_description:'Enter profile description (max. 1000 chars):', description_empty:'No description',
+                id:'ID', reg_date:'Registration date', winrate:'Winrate', games_played:'Games played', wins:'Wins',
+                losses:'Losses', account_not_found:'Incorrect login or password', register_sent:'Registration sent to the bot!',
+                reset_sent:'Recovery code sent to ', enter_email:'Enter your email', invalid_email:'Invalid email',
+                tag_starts_with:'Tag must start with #', nickname_min:'Nickname must be at least 3 characters',
+                password_min:'Password must be at least 6 characters', battles_title:'Last battles log', battle_mode:'Mode',
+                battle_time:'Time', battle_players:'Players', battle_result:'Result', battle_win:'WIN',
+                battle_loss:'LOSS', vs:'VS', round:'Round', battle_click_profile:'Tap to view profile',
+                banner_choose:'Choose banner', close:'Close', banner_static_1:'Space', banner_static_2:'Fire',
+                banner_static_3:'Ice', banner_static_4:'Grass', banner_static_5:'Neon', banner_animated_1:'Lightning',
+                banner_animated_2:'Waves', banner_animated_3:'Flame', banner_animated_4:'Meteor', banner_animated_5:'Rainbow',
+                banner_custom:'Custom banner', select:'Select', selected:'Selected', leaderboard_title:'Leaderboard',
+                my_place:'My place', not_in_top:'—', soon:'soon', top_place:'Top place',
+                mode_brawlball:'Brawl Ball', mode_gemgrab:'Gem Grab', mode_siege:'Siege', mode_hotzone:'Hot Zone',
+                mode_heist:'Heist', profile_modal_title:'Player Profile', profile_modal_elo:'ELO: {elo}',
+                profile_modal_wins:'Wins: {wins}', profile_modal_losses:'Losses: {losses}',
+                profile_modal_winrate:'Winrate: {winrate}%', profile_modal_games:'Games played: {games}',
+                profile_modal_regdate:'Registration date: {regdate}', profile_modal_id:'ID: {id}', profile_modal_top:'Top place: {top}',
+                friends_tab_my:'My friends', friends_tab_requests:'Requests', friends_tab_find:'Find',
+                friends_empty:'List is empty', friends_add:'Add', friends_search_placeholder:'Search by nickname or tag...',
+                friends_remove:'Remove', friends_accept:'Accept', friends_reject:'Reject',
+                friends_already_friend:'Already friends', friends_request_sent:'Request sent',
+                search_title:'Search', search_3x3:'Tournaments 3x3', search_sd:'Tournaments SD',
+                search_3x3_desc:'Team tournament 3 vs 3', search_sd_desc:'Single tournament',
+                rooms_section:'Rooms', rooms_create:'Create room', rooms_join:'Join room',
+                rooms_leave:'Leave room', rooms_disband:'Disband room', rooms_code:'Room code',
+                rooms_enter_code:'Enter room code', rooms_confirm:'Join', rooms_cancel:'Cancel',
+                rooms_no_rooms:'No active rooms', rooms_not_in_room:'You are not in a room', rooms_full:'Room is full',
+                rooms_already_in:'You are already in this room', rooms_room_not_found:'Room not found',
+                rooms_only_host:'Only host can disband room', rooms_ready:'Ready',
+                rooms_ready_captain:'Ready (captain)', rooms_ready_disabled:'Only captain can start search',
+                rooms_search_started:'Tournament search started!', chat_title:'Room chat', chat_placeholder:'Type a message...',
+                chat_send:'Send'
             }
         };
 
-        function t(key, params = {}) {
+        function t(key, params={}) {
             let text = i18n[userSettings.language][key] || key;
-            for (let [k, v] of Object.entries(params)) {
-                text = text.replace(`{${k}}`, v);
-            }
+            for (let [k,v] of Object.entries(params)) text = text.replace(`{${k}}`, v);
             return text;
         }
 
@@ -1149,21 +645,15 @@
             return 'Бронза';
         }
 
-        function darkenColor(hex, amount = 0.3) {
-            let r = parseInt(hex.slice(1, 3), 16);
-            let g = parseInt(hex.slice(3, 5), 16);
-            let b = parseInt(hex.slice(5, 7), 16);
-            r = Math.floor(r * (1 - amount));
-            g = Math.floor(g * (1 - amount));
-            b = Math.floor(b * (1 - amount));
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        function darkenColor(hex, amount=0.3) {
+            let r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+            r=Math.floor(r*(1-amount)); g=Math.floor(g*(1-amount)); b=Math.floor(b*(1-amount));
+            return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
         }
 
         function getContrastColor(hex) {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+            const brightness=(r*299+g*587+b*114)/1000;
             return brightness > 0.5 ? '#000000' : '#ffffff';
         }
 
@@ -1197,114 +687,50 @@
                 dot.classList.toggle('active', dot.dataset.color === accent);
             });
             if (currentTab === 'profile' && userData) {
-                renderProfile();
+                renderProfile(document.querySelector('.tab-content-inner'));
             }
         }
 
         const themes = {
             light: {
-                '--bg': '#ffffff',
-                '--text': '#000000',
-                '--card-bg': '#ffffff',
-                '--card-shadow': '0 12px 40px rgba(0,0,0,0.12)',
-                '--border-color': '#dddddd',
-                '--input-bg': '#f5f5f5',
-                '--input-border': '#dddddd',
-                '--input-focus-shadow': 'rgba(233,69,96,0.2)',
-                '--btn-primary-bg': '#000000',
-                '--btn-primary-text': '#ffffff',
-                '--btn-primary-hover': '#333333',
-                '--btn-danger-bg': '#ffffff',
-                '--btn-danger-text': '#e94560',
-                '--btn-danger-border': '#e94560',
-                '--toggle-bg': '#dddddd',
-                '--toggle-active': '#e94560',
-                '--link-color': '#e94560',
-                '--select-option-bg': '#ffffff',
-                '--select-option-border': '#dddddd',
-                '--select-option-active-bg': '#000000',
-                '--select-option-active-text': '#ffffff',
-                '--tab-bg': '#f5f5f5',
-                '--tab-text': '#777777',
-                '--tab-active-bg': '#000000',
-                '--tab-active-text': '#ffffff',
-                '--info-label': '#888888',
-                '--info-value': '#000000',
-                '--description-bg': '#f9f9f9',
-                '--description-text': '#555555',
-                '--error-color': '#e94560',
-                '--success-color': '#4CAF50',
-                '--modal-bg': 'rgba(255,255,255,0.85)'
+                '--bg':'#ffffff','--text':'#000000','--card-bg':'#ffffff','--card-shadow':'0 12px 40px rgba(0,0,0,0.12)',
+                '--border-color':'#dddddd','--input-bg':'#f5f5f5','--input-border':'#dddddd',
+                '--input-focus-shadow':'rgba(233,69,96,0.2)','--btn-primary-bg':'#000000','--btn-primary-text':'#ffffff',
+                '--btn-primary-hover':'#333333','--btn-danger-bg':'#ffffff','--btn-danger-text':'#e94560',
+                '--btn-danger-border':'#e94560','--toggle-bg':'#dddddd','--toggle-active':'#e94560','--link-color':'#e94560',
+                '--select-option-bg':'#ffffff','--select-option-border':'#dddddd','--select-option-active-bg':'#000000',
+                '--select-option-active-text':'#ffffff','--tab-bg':'#f5f5f5','--tab-text':'#777777','--tab-active-bg':'#000000',
+                '--tab-active-text':'#ffffff','--info-label':'#888888','--info-value':'#000000','--description-bg':'#f9f9f9',
+                '--description-text':'#555555','--error-color':'#e94560','--success-color':'#4CAF50','--modal-bg':'rgba(255,255,255,0.85)'
             },
             dark: {
-                '--bg': '#1a1a2e',
-                '--text': '#eeeeee',
-                '--card-bg': '#2d2d44',
-                '--card-shadow': '0 12px 40px rgba(0,0,0,0.6)',
-                '--border-color': '#3a3a55',
-                '--input-bg': '#3a3a55',
-                '--input-border': '#4a4a65',
-                '--input-focus-shadow': 'rgba(233,69,96,0.3)',
-                '--btn-primary-bg': '#e94560',
-                '--btn-primary-text': '#ffffff',
-                '--btn-primary-hover': '#c0392b',
-                '--btn-danger-bg': '#2d2d44',
-                '--btn-danger-text': '#e94560',
-                '--btn-danger-border': '#e94560',
-                '--toggle-bg': '#4a4a65',
-                '--toggle-active': '#e94560',
-                '--link-color': '#e94560',
-                '--select-option-bg': '#2d2d44',
-                '--select-option-border': '#4a4a65',
-                '--select-option-active-bg': '#e94560',
-                '--select-option-active-text': '#ffffff',
-                '--tab-bg': '#2d2d44',
-                '--tab-text': '#888888',
-                '--tab-active-bg': '#e94560',
-                '--tab-active-text': '#ffffff',
-                '--info-label': '#888888',
-                '--info-value': '#eeeeee',
-                '--description-bg': '#2d2d44',
-                '--description-text': '#bbbbbb',
-                '--error-color': '#e94560',
-                '--success-color': '#4CAF50',
-                '--modal-bg': 'rgba(0,0,0,0.8)'
+                '--bg':'#1a1a2e','--text':'#eeeeee','--card-bg':'#2d2d44','--card-shadow':'0 12px 40px rgba(0,0,0,0.6)',
+                '--border-color':'#3a3a55','--input-bg':'#3a3a55','--input-border':'#4a4a65',
+                '--input-focus-shadow':'rgba(233,69,96,0.3)','--btn-primary-bg':'#e94560','--btn-primary-text':'#ffffff',
+                '--btn-primary-hover':'#c0392b','--btn-danger-bg':'#2d2d44','--btn-danger-text':'#e94560',
+                '--btn-danger-border':'#e94560','--toggle-bg':'#4a4a65','--toggle-active':'#e94560','--link-color':'#e94560',
+                '--select-option-bg':'#2d2d44','--select-option-border':'#4a4a65','--select-option-active-bg':'#e94560',
+                '--select-option-active-text':'#ffffff','--tab-bg':'#2d2d44','--tab-text':'#888888','--tab-active-bg':'#e94560',
+                '--tab-active-text':'#ffffff','--info-label':'#888888','--info-value':'#eeeeee','--description-bg':'#2d2d44',
+                '--description-text':'#bbbbbb','--error-color':'#e94560','--success-color':'#4CAF50','--modal-bg':'rgba(0,0,0,0.8)'
             }
         };
 
         const bannerData = [
-            { id: 'static1', type: 'static', nameKey: 'banner_static_1', color: '#ff6b6b' },
-            { id: 'static2', type: 'static', nameKey: 'banner_static_2', color: '#f39c12' },
-            { id: 'static3', type: 'static', nameKey: 'banner_static_3', color: '#3498db' },
-            { id: 'static4', type: 'static', nameKey: 'banner_static_4', color: '#2ecc71' },
-            { id: 'static5', type: 'static', nameKey: 'banner_static_5', color: '#9b59b6' },
-            { id: 'anim1', type: 'animated', nameKey: 'banner_animated_1', color: '#e74c3c' },
-            { id: 'anim2', type: 'animated', nameKey: 'banner_animated_2', color: '#1abc9c' },
-            { id: 'anim3', type: 'animated', nameKey: 'banner_animated_3', color: '#e67e22' },
-            { id: 'anim4', type: 'animated', nameKey: 'banner_animated_4', color: '#8e44ad' },
-            { id: 'anim5', type: 'animated', nameKey: 'banner_animated_5', color: '#f1c40f' },
-            { id: 'custom', type: 'custom', nameKey: 'banner_custom', color: '#888888' }
+            { id:'static1', type:'static', nameKey:'banner_static_1', color:'#ff6b6b' },
+            { id:'static2', type:'static', nameKey:'banner_static_2', color:'#f39c12' },
+            { id:'static3', type:'static', nameKey:'banner_static_3', color:'#3498db' },
+            { id:'static4', type:'static', nameKey:'banner_static_4', color:'#2ecc71' },
+            { id:'static5', type:'static', nameKey:'banner_static_5', color:'#9b59b6' },
+            { id:'anim1', type:'animated', nameKey:'banner_animated_1', color:'#e74c3c' },
+            { id:'anim2', type:'animated', nameKey:'banner_animated_2', color:'#1abc9c' },
+            { id:'anim3', type:'animated', nameKey:'banner_animated_3', color:'#e67e22' },
+            { id:'anim4', type:'animated', nameKey:'banner_animated_4', color:'#8e44ad' },
+            { id:'anim5', type:'animated', nameKey:'banner_animated_5', color:'#f1c40f' },
+            { id:'custom', type:'custom', nameKey:'banner_custom', color:'#888888' }
         ];
 
-        function getDivision(elo) {
-            if (elo >= 6000) return 'PRO';
-            if (elo >= 4500) return 'Мастер';
-            if (elo >= 3500) return 'Легенда';
-            if (elo >= 3000) return 'Мифик';
-            if (elo >= 2500) return 'Алмаз';
-            if (elo >= 2000) return 'Золото';
-            if (elo >= 1500) return 'Серебро';
-            return 'Бронза';
-        }
-
-        function t(key, params = {}) {
-            let text = i18n[userSettings.language][key] || key;
-            for (let [k, v] of Object.entries(params)) {
-                text = text.replace(`{${k}}`, v);
-            }
-            return text;
-        }
-
+        // ===== Навигация =====
         function hideAllAuth() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('registerScreen').classList.add('hidden');
@@ -1315,7 +741,7 @@
             hideAllAuth();
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainScreen').classList.add('hidden');
-            document.body.style.background = '#000';
+            document.body.style.background='#000';
             updateLanguage();
         }
 
@@ -1323,7 +749,7 @@
             hideAllAuth();
             document.getElementById('registerScreen').classList.remove('hidden');
             document.getElementById('mainScreen').classList.add('hidden');
-            document.body.style.background = '#000';
+            document.body.style.background='#000';
             updateLanguage();
         }
 
@@ -1331,14 +757,14 @@
             hideAllAuth();
             document.getElementById('resetScreen').classList.remove('hidden');
             document.getElementById('mainScreen').classList.add('hidden');
-            document.body.style.background = '#000';
+            document.body.style.background='#000';
             updateLanguage();
         }
 
         function showMain() {
             hideAllAuth();
             document.getElementById('mainScreen').classList.remove('hidden');
-            document.body.style.background = 'var(--bg)';
+            document.body.style.background='var(--bg)';
             applyThemeAndColor();
             showTab('profile');
         }
@@ -1346,15 +772,11 @@
         function updateLanguage() {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
-                if (t(key)) {
-                    el.textContent = t(key);
-                }
+                if (t(key)) el.textContent = t(key);
             });
             document.querySelectorAll('input[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
-                if (t(key)) {
-                    el.placeholder = t(key);
-                }
+                if (t(key)) el.placeholder = t(key);
             });
             if (!document.getElementById('mainScreen').classList.contains('hidden') && currentTab) {
                 showTab(currentTab);
@@ -1370,17 +792,13 @@
             currentTab = tab;
             const content = document.getElementById('tabContent');
             content.style.opacity = '0';
-
-            // Создаём внутренний контейнер с анимацией, если его нет
             let inner = content.querySelector('.tab-content-inner');
             if (!inner) {
                 inner = document.createElement('div');
                 inner.className = 'tab-content-inner';
                 content.appendChild(inner);
             }
-
             setTimeout(() => {
-                // Передаём inner в функции рендера
                 if (tab === 'profile') {
                     renderProfile(inner);
                 } else if (tab === 'changePassword') {
@@ -1402,54 +820,34 @@
             }, 80);
         }
 
-        // ---- РЕНДЕР ПРОФИЛЯ ----
-        function renderProfile(container) {
+        // ===== Рендер профиля =====
+        async function renderProfile(container) {
             if (!userData) {
                 container.innerHTML = `<p style="text-align:center;color:var(--info-label);padding:30px">${t('profile_no_data')}</p>`;
                 return;
             }
+            // Загружаем актуальные данные пользователя
+            const data = await api.getProfile(userData.id);
+            if (data) {
+                userData = { ...userData, ...data };
+            }
             const division = getDivision(userData.elo);
-            const avatarHtml = userData.avatarUrl ?
-                `<img class="avatar-img" src="${userData.avatarUrl}" alt="аватар">` :
-                `<div class="avatar-placeholder">${(userData.nickname || '?')[0].toUpperCase()}</div>`;
+            const avatarHtml = userData.avatarUrl
+                ? `<img class="avatar-img" src="${userData.avatarUrl}" alt="аватар">`
+                : `<div class="avatar-placeholder">${(userData.nickname||'?')[0].toUpperCase()}</div>`;
+
             let bannerStyle = '';
-            let isCustom = false;
-            if (userData.bannerId) {
-                const banner = bannerData.find(b => b.id === userData.bannerId);
-                if (banner) {
-                    if (banner.type === 'custom') {
-                        isCustom = true;
-                        if (userData.customBannerUrl) {
-                            bannerStyle =
-                                `background-image: url(${userData.customBannerUrl}); background-size: cover; background-position: center;`;
-                        } else {
-                            bannerStyle =
-                                `background: linear-gradient(135deg, var(--banner-start), var(--banner-end));`;
-                        }
-                    } else {
-                        bannerStyle =
-                            `background: linear-gradient(135deg, ${banner.color}, ${darkenColor(banner.color, 0.3)});`;
-                    }
-                } else {
-                    bannerStyle = `background: linear-gradient(135deg, var(--banner-start), var(--banner-end));`;
-                }
+            if (userData.bannerUrl) {
+                bannerStyle = `background-image:url(${userData.bannerUrl});background-size:cover;background-position:center;`;
             } else {
-                bannerStyle = `background: linear-gradient(135deg, var(--banner-start), var(--banner-end));`;
+                bannerStyle = `background:linear-gradient(135deg, var(--banner-start), var(--banner-end));`;
             }
-            let topRankColor = '#888';
-            let topRankText = t('not_in_top');
-            if (userData.topRank && userData.topRank <= 150) {
-                topRankText = `#${userData.topRank}`;
-                if (userData.topRank === 1) topRankColor = '#ffd700';
-                else if (userData.topRank === 2) topRankColor = '#c0c0c0';
-                else if (userData.topRank === 3) topRankColor = '#cd7f32';
-                else topRankColor = '#888';
-            }
+
             container.innerHTML = `
                 <div>
                     <div class="banner-section" style="${bannerStyle}">
                         <div class="banner-shine"></div>
-                        <button class="banner-edit ${isCustom ? 'visible' : ''}" onclick="editCustomBanner()" id="bannerEditBtn">✎</button>
+                        <button class="banner-edit visible" onclick="uploadBanner()">✎</button>
                         <div class="banner-content">
                             <div class="avatar-wrap">
                                 ${avatarHtml}
@@ -1458,21 +856,17 @@
                             </div>
                             <div class="banner-info">
                                 <div class="info-group">
-                                    <div class="banner-nickname">
-                                        <span id="nickDisplay">${userData.nickname}</span>
-                                    </div>
+                                    <div class="banner-nickname">${userData.nickname} <span class="edit-icon" onclick="editNickname()">✎</span></div>
                                     <div class="banner-tag">${userData.brawl_tag} | ${userData.brawl_name}</div>
                                     <span class="banner-rank">${division}</span><span class="banner-elo">${userData.elo} ELO</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div style="text-align:center; margin-bottom:12px;">
-                        <button class="btn primary" onclick="openBannerModal()" data-i18n="banner_choose">Выбрать баннер</button>
-                    </div>
+                    <div style="text-align:center;margin-bottom:12px;"><button class="btn primary" onclick="openBannerModal()">${t('banner_choose')}</button></div>
                     <div class="info-section">
                         <div class="info-row"><span class="info-label">${t('id')}</span><span class="info-value">#${userData.id}</span></div>
-                        <div class="info-row"><span class="info-label">${t('top_place')}</span><span class="info-value" style="color:${topRankColor}; font-weight:bold;">${topRankText}</span></div>
+                        <div class="info-row"><span class="info-label">${t('top_place')}</span><span class="info-value">${userData.topRank ? '#'+userData.topRank : t('not_in_top')}</span></div>
                         <div class="info-row"><span class="info-label">${t('reg_date')}</span><span class="info-value">${userData.reg_date}</span></div>
                         <div class="info-row"><span class="info-label">${t('winrate')}</span><span class="info-value">${userData.winrate}%</span></div>
                         <div class="info-row"><span class="info-label">${t('games_played')}</span><span class="info-value">${userData.games}</span></div>
@@ -1483,386 +877,397 @@
                         <span class="description-edit" onclick="editDescription()">✎</span>
                         <span id="descDisplay">${userData.description || t('description_empty')}</span>
                     </div>
-                    <div style="margin-top: 20px;"></div>
                     <button class="btn danger" onclick="showTab('changePassword')">${t('change_password')}</button>
                     <button class="logout-btn" onclick="logout()">${t('logout')}</button>
-                </div>
-            `;
+                </div>`;
         }
 
-        // ---- РЕНДЕР ДРУЗЕЙ ----
-        function renderFriends(container, subtab) {
+        // ===== Редактирование профиля =====
+        async function uploadAvatar() {
+            const inp = document.createElement('input');
+            inp.type = 'file';
+            inp.accept = 'image/*';
+            inp.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file || !userData) return;
+                const formData = new FormData();
+                formData.append('user_id', userData.id);
+                formData.append('avatar', file);
+                const result = await api.uploadAvatar(userData.id, formData);
+                if (result.avatarUrl) {
+                    userData.avatarUrl = result.avatarUrl;
+                    renderProfile(document.querySelector('.tab-content-inner'));
+                }
+            };
+            inp.click();
+        }
+
+        async function uploadBanner() {
+            const inp = document.createElement('input');
+            inp.type = 'file';
+            inp.accept = 'image/*';
+            inp.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file || !userData) return;
+                const formData = new FormData();
+                formData.append('user_id', userData.id);
+                formData.append('banner', file);
+                const result = await api.uploadBanner(userData.id, formData);
+                if (result.bannerUrl) {
+                    userData.bannerUrl = result.bannerUrl;
+                    renderProfile(document.querySelector('.tab-content-inner'));
+                }
+            };
+            inp.click();
+        }
+
+        async function editNickname() {
+            const newName = prompt(t('edit_nickname'), userData?.nickname || '');
+            if (newName && newName.trim().length >= 3 && newName.trim().length <= 35) {
+                const result = await api.updateProfile(userData.id, { nickname: newName.trim() });
+                if (result.ok) {
+                    userData.nickname = newName.trim();
+                    renderProfile(document.querySelector('.tab-content-inner'));
+                }
+            }
+        }
+
+        async function editDescription() {
+            const newDesc = prompt(t('edit_description'), userData?.description || '');
+            if (newDesc !== null && newDesc.trim().length <= 1000) {
+                const result = await api.updateProfile(userData.id, { description: newDesc.trim() || '' });
+                if (result.ok) {
+                    userData.description = newDesc.trim() || '';
+                    renderProfile(document.querySelector('.tab-content-inner'));
+                }
+            }
+        }
+
+        // ===== Рендер друзей =====
+        async function renderFriends(container, subtab) {
             const tabsHtml = `
                 <div class="friends-tabs">
-                    <button class="${subtab === 'my' ? 'active' : ''}" onclick="renderFriends(container, 'my')">${t('friends_tab_my')}</button>
-                    <button class="${subtab === 'requests' ? 'active' : ''}" onclick="renderFriends(container, 'requests')">${t('friends_tab_requests')}</button>
-                    <button class="${subtab === 'find' ? 'active' : ''}" onclick="renderFriends(container, 'find')">${t('friends_tab_find')}</button>
-                </div>
-            `;
+                    <button class="${subtab==='my'?'active':''}" onclick="renderFriends(document.querySelector('.tab-content-inner'),'my')">${t('friends_tab_my')}</button>
+                    <button class="${subtab==='requests'?'active':''}" onclick="renderFriends(document.querySelector('.tab-content-inner'),'requests')">${t('friends_tab_requests')}</button>
+                    <button class="${subtab==='find'?'active':''}" onclick="renderFriends(document.querySelector('.tab-content-inner'),'find')">${t('friends_tab_find')}</button>
+                </div>`;
             let bodyHtml = '';
-            if (subtab === 'my') {
-                if (friends.length === 0) {
-                    bodyHtml = `<p style="text-align:center;color:var(--info-label);padding:20px;">${t('friends_empty')}</p>`;
-                } else {
-                    bodyHtml = friends.map((f, index) => `
-                        <div class="friend-card" style="animation-delay: ${index * 0.05}s;">
-                            <div class="f-avatar" style="background:${f.avatar};"></div>
-                            <div class="f-info">
-                                <span class="f-name">${f.nickname}</span>
-                                <span class="f-tag">${f.tag}</span>
-                            </div>
+            try {
+                if (subtab === 'my') {
+                    const friends = await api.getFriends(userData.id);
+                    if (friends.length === 0) bodyHtml = `<p style="text-align:center;color:var(--info-label);padding:20px;">${t('friends_empty')}</p>`;
+                    else bodyHtml = friends.map(f => `
+                        <div class="friend-card">
+                            <div class="f-avatar" style="background:${f.avatarUrl ? `url(${f.avatarUrl})` : '#ccc'}"></div>
+                            <div class="f-info"><span class="f-name">${f.nickname}</span><span class="f-tag">${f.brawl_tag}</span></div>
                             <span class="f-elo">${f.elo} ELO</span>
+                            <div class="f-actions"><button class="remove" onclick="removeFriend(${f.id})">✕</button></div>
+                        </div>`).join('');
+                } else if (subtab === 'requests') {
+                    const requests = await api.getFriendRequests(userData.id);
+                    if (requests.length === 0) bodyHtml = `<p style="text-align:center;color:var(--info-label);padding:20px;">${t('friends_empty')}</p>`;
+                    else bodyHtml = requests.map(r => `
+                        <div class="friend-card">
+                            <div class="f-avatar" style="background:${r.from_user.avatarUrl ? `url(${r.from_user.avatarUrl})` : '#ccc'}"></div>
+                            <div class="f-info"><span class="f-name">${r.from_user.nickname}</span><span class="f-tag">${r.from_user.brawl_tag}</span></div>
                             <div class="f-actions">
-                                <button class="remove" onclick="removeFriend('${f.nickname}')">✕</button>
+                                <button class="accept" onclick="acceptRequest(${r.request_id})">✓</button>
+                                <button class="reject" onclick="rejectRequest(${r.request_id})">✕</button>
                             </div>
-                        </div>
-                    `).join('');
+                        </div>`).join('');
+                } else if (subtab === 'find') {
+                    bodyHtml = `<input class="input search-input" id="searchInput" type="text" placeholder="${t('friends_search_placeholder')}" oninput="searchUsers()"><div class="search-results" id="searchResults"></div>`;
+                    window._leaderboardCache = await api.getLeaderboard(200);
                 }
-            } else if (subtab === 'requests') {
-                if (friendRequests.length === 0) {
-                    bodyHtml = `<p style="text-align:center;color:var(--info-label);padding:20px;">${t('friends_empty')}</p>`;
-                } else {
-                    bodyHtml = friendRequests.map((f, index) => `
-                        <div class="friend-card" style="animation-delay: ${index * 0.05}s;">
-                            <div class="f-avatar" style="background:${f.avatar};"></div>
-                            <div class="f-info">
-                                <span class="f-name">${f.nickname}</span>
-                                <span class="f-tag">${f.tag}</span>
-                            </div>
-                            <span class="f-elo">${f.elo} ELO</span>
-                            <div class="f-actions">
-                                <button class="accept" onclick="acceptRequest('${f.nickname}')">✓</button>
-                                <button class="reject" onclick="rejectRequest('${f.nickname}')">✕</button>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-            } else if (subtab === 'find') {
-                bodyHtml = `
-                    <input class="input search-input" id="searchInput" type="text" placeholder="${t('friends_search_placeholder')}" oninput="performSearch(container)">
-                    <div class="search-results" id="searchResults"></div>
-                `;
-                setTimeout(() => {
-                    document.getElementById('searchResults').innerHTML = '';
-                }, 0);
-            }
-            container.innerHTML = `${tabsHtml}${bodyHtml}`;
-            // Привязываем функции к контейнеру
-            if (subtab === 'find') {
-                // уже есть oninput
+                container.innerHTML = tabsHtml + bodyHtml;
+            } catch(e) {
+                container.innerHTML = '<p>Ошибка загрузки</p>';
             }
         }
 
-        function removeFriend(nickname) {
-            friends = friends.filter(f => f.nickname !== nickname);
+        function searchUsers() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const res = document.getElementById('searchResults');
+            if (!window._leaderboardCache || query.length === 0) { res.innerHTML = ''; return; }
+            const filtered = window._leaderboardCache.filter(u => u.nickname.toLowerCase().includes(query) || u.brawl_tag.toLowerCase().includes(query));
+            res.innerHTML = filtered.map(u => `
+                <div class="friend-card">
+                    <div class="f-avatar" style="background:${u.avatarUrl ? `url(${u.avatarUrl})` : '#ccc'}"></div>
+                    <div class="f-info"><span class="f-name">${u.nickname}</span><span class="f-tag">${u.brawl_tag}</span></div>
+                    <span class="f-elo">${u.elo} ELO</span>
+                    <div class="f-actions"><button class="add-btn" onclick="addFriend(${u.id})">${t('friends_add')}</button></div>
+                </div>`).join('');
+        }
+
+        async function addFriend(id) {
+            await api.sendFriendRequest(userData.id, id);
+            alert(t('friends_request_sent'));
+            searchUsers();
+        }
+
+        async function removeFriend(id) {
+            await api.removeFriend(userData.id, id);
             renderFriends(document.querySelector('.tab-content-inner'), 'my');
         }
 
-        function acceptRequest(nickname) {
-            const user = friendRequests.find(f => f.nickname === nickname);
-            if (user) {
-                friends.push(user);
-                friendRequests = friendRequests.filter(f => f.nickname !== nickname);
-                renderFriends(document.querySelector('.tab-content-inner'), 'requests');
-            }
-        }
-
-        function rejectRequest(nickname) {
-            friendRequests = friendRequests.filter(f => f.nickname !== nickname);
+        async function acceptRequest(id) {
+            await api.acceptFriendRequest(id);
             renderFriends(document.querySelector('.tab-content-inner'), 'requests');
         }
 
-        function performSearch(container) {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            const resultsContainer = document.getElementById('searchResults');
-            if (query.length === 0) {
-                resultsContainer.innerHTML = '';
-                return;
+        async function rejectRequest(id) {
+            await api.rejectFriendRequest(id);
+            renderFriends(document.querySelector('.tab-content-inner'), 'requests');
+        }
+
+        // ===== Рендер топа =====
+        async function renderLeaderboard(container) {
+            try {
+                const players = await api.getLeaderboard(100);
+                let html = `<h2 style="margin-bottom:12px">${t('leaderboard_title')}</h2><div class="leaderboard-list">`;
+                players.forEach((p, i) => {
+                    const rank = i+1;
+                    let rankClass = 'normal';
+                    if (rank===1) rankClass='gold';
+                    else if (rank===2) rankClass='silver';
+                    else if (rank===3) rankClass='bronze';
+                    html += `
+                        <div class="lb-row ${userData && p.id === userData.id ? 'me' : ''}" onclick="viewProfile(${p.id})">
+                            <div class="glass-overlay"></div>
+                            <div class="rank-badge ${rankClass}">${rank}</div>
+                            <div class="avatar-wrap"><div class="avatar" style="background:${p.avatarUrl ? `url(${p.avatarUrl})` : '#ccc'}"></div></div>
+                            <span class="nick">${p.nickname}</span>
+                            <span class="elo-group">${p.elo} ELO</span>
+                        </div>`;
+                });
+                html += '</div>';
+                if (userData) {
+                    const myIndex = players.findIndex(p => p.id === userData.id);
+                    html += `<div class="my-rank-box">${t('my_place')}: ${myIndex !== -1 ? '#'+(myIndex+1) : t('not_in_top')} (${userData.elo} ELO)</div>`;
+                }
+                container.innerHTML = html;
+            } catch(e) {
+                container.innerHTML = '<p>Ошибка загрузки топа</p>';
             }
-            const excluded = friends.map(f => f.nickname).concat(friendRequests.map(f => f.nickname)).concat([userData
-                .nickname
-            ]);
-            const results = allUsers.filter(u =>
-                !excluded.includes(u.nickname) &&
-                (u.nickname.toLowerCase().includes(query) || u.tag.toLowerCase().includes(query))
-            );
-            if (results.length === 0) {
-                resultsContainer.innerHTML =
-                    `<p style="text-align:center;color:var(--info-label);padding:10px;">Ничего не найдено</p>`;
-                return;
+        }
+
+        // ===== Рендер лога боёв =====
+        async function renderBattles(container) {
+            try {
+                const battles = await api.getBattles(userData.id);
+                // Генерируем визуализацию, аналогичную предыдущей (с моками)
+                // В реальности нужно адаптировать под формат с сервера.
+                // Для примера используем упрощённую версию.
+                if (!battles || battles.length === 0) {
+                    container.innerHTML = `<p style="text-align:center;color:var(--info-label);padding:20px;">Боев пока нет</p>`;
+                    return;
+                }
+                let html = `<h2 style="margin-bottom:12px">${t('battles_title')}</h2><div class="battle-list">`;
+                battles.forEach(b => {
+                    html += `
+                        <div class="battle-card" style="background:${b.gradient || '#333'}">
+                            <div class="battle-header"><span class="battle-mode">${b.mode}</span></div>
+                            <div class="battle-teams">
+                                <div class="team">${b.team1.map(p => `<div class="team-player"><div class="mini-avatar" style="background:${p.avatarColor||'#ccc'}"></div><span class="nick">${p.name}</span></div>`).join('')}</div>
+                                <div class="vs-label">${t('vs')}</div>
+                                <div class="team right">${b.team2.map(p => `<div class="team-player"><div class="mini-avatar" style="background:${p.avatarColor||'#ccc'}"></div><span class="nick">${p.name}</span></div>`).join('')}</div>
+                            </div>
+                            <div class="battle-footer"><span class="battle-time">${b.timeAgo}</span><span class="battle-result ${b.win?'win':'loss'}">${b.win ? t('battle_win') : t('battle_loss')}</span></div>
+                        </div>`;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } catch(e) {
+                container.innerHTML = '<p>Ошибка загрузки боёв</p>';
             }
-            resultsContainer.innerHTML = results.map((u, index) => `
-                <div class="friend-card" style="animation-delay: ${index * 0.03}s;">
-                    <div class="f-avatar" style="background:${u.avatar};"></div>
-                    <div class="f-info">
-                        <span class="f-name">${u.nickname}</span>
-                        <span class="f-tag">${u.tag}</span>
+        }
+
+        // ===== Рендер поиска и комнат =====
+        async function renderSearch(container) {
+            const glassClass = userSettings.theme === 'dark' ? 'rooms-glass dark' : 'rooms-glass';
+            let leftHtml = '', membersHtml = '', chatHtml = '', codeHtml = '', readyBtnHtml = '';
+
+            if (currentRoomId) {
+                const room = await api.getRoom(currentRoomId);
+                if (!room) {
+                    currentRoomId = null;
+                    renderSearch(container);
+                    return;
+                }
+                const isHost = room.host_id === userData.id;
+                leftHtml = `
+                    <div class="room-code-block">
+                        <span class="code-label">${t('rooms_code')}</span>
+                        <span class="code">${room.code}</span>
+                        <button class="btn btn-danger" onclick="${isHost ? 'disbandRoom()' : 'leaveRoom()'}">${isHost ? t('rooms_disband') : t('rooms_leave')}</button>
                     </div>
-                    <span class="f-elo">${u.elo} ELO</span>
-                    <div class="f-actions">
-                        <button class="add-btn" onclick="addFriend('${u.nickname}')">${t('friends_add')}</button>
+                `;
+                membersHtml = room.members.map(m => `
+                    <div class="member-item">
+                        <div class="avatar" style="background:${m.avatar_color || '#2a2a3e'};">
+                            ${m.is_host ? '<span class="crown">♛</span>' : ''}
+                            ${m.nickname[0]}
+                        </div>
+                        <div>
+                            <div class="member-name">${m.nickname}</div>
+                            <div class="member-tag">${m.brawl_tag || '#??????'}</div>
+                        </div>
+                    </div>
+                `).join('');
+                // Чат
+                const msgs = await api.getMessages(room.id);
+                const msgHtml = msgs.map(m => `<div class="msg"><span class="sender">${m.sender}:</span> ${m.text}</div>`).join('');
+                chatHtml = `
+                    <div class="chat-area">
+                        <div class="chat-title">${t('chat_title')}</div>
+                        <div class="chat-messages" id="chatMessages">${msgHtml}</div>
+                        <div class="chat-input-row">
+                            <input type="text" id="chatInput" placeholder="${t('chat_placeholder')}" onkeydown="if(event.key==='Enter') sendChatMessage()">
+                            <button onclick="sendChatMessage()">${t('chat_send')}</button>
+                        </div>
+                    </div>
+                `;
+                if (isHost) {
+                    readyBtnHtml = `<div class="room-ready-btn"><button class="btn btn-success" onclick="startTournamentSearch('3x3')">${t('rooms_ready_captain')}</button></div>`;
+                } else {
+                    readyBtnHtml = `<div class="room-ready-btn"><button class="btn btn-primary" disabled>${t('rooms_ready_disabled')}</button></div>`;
+                }
+            } else {
+                leftHtml = `
+                    <div class="rooms-actions">
+                        <button class="btn btn-primary" onclick="createRoom()">${t('rooms_create')}</button>
+                        <button class="btn btn-outline" onclick="openJoinModal()">${t('rooms_join')}</button>
+                    </div>
+                `;
+                membersHtml = `<div class="rooms-empty">${t('rooms_not_in_room')}</div>`;
+                chatHtml = '';
+                readyBtnHtml = '';
+            }
+
+            const inRoom = !!currentRoomId;
+            container.innerHTML = `
+                <div class="search-container">
+                    <div class="search-header"><h2>${t('search_title')}</h2></div>
+                    <div class="tournament-cards">
+                        <div class="tournament-card type-3x3" onclick="startTournamentSearch('3x3')"><div class="title">${t('search_3x3')}</div><div class="sub">${t('search_3x3_desc')}</div><div class="arrow">›</div></div>
+                        <div class="tournament-card type-sd ${inRoom ? 'disabled' : ''}" onclick="${inRoom ? '' : `startTournamentSearch('sd')`}"><div class="title">${t('search_sd')}</div><div class="sub">${t('search_sd_desc')}</div><div class="arrow">›</div></div>
+                    </div>
+                    <div class="rooms-section">
+                        <div class="rooms-section-title">${t('rooms_section')}</div>
+                        <div class="${glassClass}" style="display:flex; flex-direction:column; gap:16px;">
+                            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                                <div style="flex:1; min-width:140px;">${leftHtml}</div>
+                                <div style="flex:1; min-width:140px; border-left:1px solid rgba(255,255,255,0.15); padding-left:14px;">
+                                    <div style="font-size:13px; font-weight:600; color:var(--info-label); margin-bottom:8px;">Участники</div>
+                                    <div class="members-list">${membersHtml}</div>
+                                    ${readyBtnHtml}
+                                </div>
+                            </div>
+                            ${chatHtml}
+                        </div>
+                    </div>
+                </div>`;
+            if (currentRoomId) {
+                if (chatInterval) clearInterval(chatInterval);
+                chatInterval = setInterval(async () => {
+                    const msgs = await api.getMessages(currentRoomId);
+                    const chat = document.getElementById('chatMessages');
+                    if (chat) chat.innerHTML = msgs.map(m => `<div class="msg"><span class="sender">${m.sender}:</span> ${m.text}</div>`).join('');
+                }, 2000);
+            }
+        }
+
+        // ===== Комнаты (действия) =====
+        async function createRoom() {
+            const data = await api.createRoom(userData.id);
+            currentRoomId = data.room_id;
+            renderSearch(document.querySelector('.tab-content-inner'));
+        }
+
+        async function joinRoom(code) {
+            const data = await api.joinRoom(userData.id, code);
+            if (data.room_id) {
+                currentRoomId = data.room_id;
+                renderSearch(document.querySelector('.tab-content-inner'));
+                return true;
+            } else {
+                alert(data.error || t('rooms_room_not_found'));
+                return false;
+            }
+        }
+
+        async function leaveRoom() {
+            await api.leaveRoom(userData.id, currentRoomId);
+            currentRoomId = null;
+            renderSearch(document.querySelector('.tab-content-inner'));
+        }
+
+        async function disbandRoom() {
+            await api.disbandRoom(userData.id, currentRoomId);
+            currentRoomId = null;
+            renderSearch(document.querySelector('.tab-content-inner'));
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+            await api.sendMessage(currentRoomId, userData.id, text);
+            input.value = '';
+            // Сообщение появится при следующем опросе
+        }
+
+        function openJoinModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay rooms-modal visible';
+            modal.innerHTML = `
+                <div class="modal-box">
+                    <h3>${t('rooms_enter_code')}</h3>
+                    <input type="text" id="joinCodeInput" placeholder="ABCDEF" maxlength="6" style="text-transform:uppercase;">
+                    <div class="modal-actions">
+                        <button class="btn-secondary" onclick="closeJoinModal()">${t('rooms_cancel')}</button>
+                        <button class="btn-primary" onclick="confirmJoin()">${t('rooms_confirm')}</button>
                     </div>
                 </div>
-            `).join('');
-        }
-
-        function addFriend(nickname) {
-            const user = allUsers.find(u => u.nickname === nickname);
-            if (!user) return;
-            if (!friendRequests.find(f => f.nickname === nickname)) {
-                friendRequests.push(user);
-            }
-            performSearch(document.querySelector('.tab-content-inner'));
-            alert(t('friends_request_sent'));
-        }
-
-        function generateAllUsers() {
-            allUsers = [];
-            for (let i = 1; i <= 100; i++) {
-                const elo = Math.floor(Math.random() * 8000) + 1000;
-                const nickname = `Игрок${i}`;
-                const tag = `#${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-                allUsers.push({
-                    nickname: nickname,
-                    elo: elo,
-                    tag: tag,
-                    avatar: `hsl(${Math.random() * 360}, 70%, 60%)`
-                });
-            }
-        }
-
-        function generateFriendsData() {
-            const shuffled = [...allUsers].sort(() => Math.random() - 0.5);
-            friends = shuffled.slice(0, 5).map(u => ({ ...u }));
-            const remaining = allUsers.filter(u => !friends.find(f => f.nickname === u.nickname));
-            const shuffled2 = remaining.sort(() => Math.random() - 0.5);
-            friendRequests = shuffled2.slice(0, 3).map(u => ({ ...u }));
-            sentRequests = [];
-        }
-
-        // ---- РЕНДЕР ЛОГА БОЕВ ----
-        function renderBattles(container) {
-            const battles = [];
-            const modes = ['Brawl Ball', 'Gem Grab', 'Siege', 'Hot Zone', 'Heist'];
-            const modeColors = {
-                'Brawl Ball': ['#2196F3', '#1565C0'],
-                'Gem Grab': ['#9C27B0', '#6A1B9A'],
-                'Siege': ['#FF9800', '#E65100'],
-                'Hot Zone': ['#F44336', '#B71C1C'],
-                'Heist': ['#4CAF50', '#1B5E20']
-            };
-            const playerPool = [
-                { nick: 'Adykat', avatar: '' },
-                { nick: 'Noob', avatar: '' },
-                { nick: 'Pro', avatar: '' },
-                { nick: 'Lega', avatar: '' },
-                { nick: 'Lox', avatar: '' },
-                { nick: 'Dayn', avatar: '' },
-                { nick: 'Star', avatar: '' },
-                { nick: 'Warrior', avatar: '' },
-                { nick: 'Titan', avatar: '' },
-                { nick: 'Ghost', avatar: '' }
-            ];
-
-            function getAvatarColor(nick) {
-                let hash = 0;
-                for (let i = 0; i < nick.length; i++) {
-                    hash = nick.charCodeAt(i) + ((hash << 5) - hash);
-                }
-                const hue = Math.abs(hash) % 360;
-                return `hsl(${hue}, 70%, 60%)`;
-            }
-            for (let i = 0; i < 25; i++) {
-                const mode = modes[Math.floor(Math.random() * modes.length)];
-                let available = playerPool.filter(p => p.nick !== 'Adykat');
-                let shuffled = available.sort(() => Math.random() - 0.5);
-                const team1 = [
-                    { nick: 'Adykat', avatar: '' },
-                    shuffled[0],
-                    shuffled[1]
-                ];
-                const team2 = [
-                    shuffled[2],
-                    shuffled[3],
-                    shuffled[4]
-                ];
-                const numRounds = Math.floor(Math.random() * 2) + 2;
-                const rounds = [];
-                let anyWin = false;
-                for (let r = 0; r < numRounds; r++) {
-                    const rWin = Math.random() > 0.5;
-                    if (rWin) anyWin = true;
-                    const rTime = `${Math.floor(Math.random() * 2)}м. ${Math.floor(Math.random() * 60)}с`;
-                    rounds.push({ result: rWin, time: rTime });
-                }
-                const win = anyWin;
-                const timeAgo =
-                    `${Math.floor(Math.random() * 24)}ч. ${Math.floor(Math.random() * 60)}мин. назад`;
-                const gradient = `linear-gradient(135deg, ${modeColors[mode][0]}, ${modeColors[mode][1]})`;
-                battles.push({
-                    mode,
-                    win,
-                    timeAgo,
-                    team1,
-                    team2,
-                    rounds,
-                    gradient
-                });
-            }
-            let html =
-                `<h2 style="margin-bottom:12px">${t('battles_title')}</h2><div class="battle-list">`;
-            battles.forEach((b, index) => {
-                const resultText = b.win ? t('battle_win') : t('battle_loss');
-                const resultClass = b.win ? 'win' : 'loss';
-                const delay = index * 0.03;
-                html += `
-                    <div class="battle-card" style="background: ${b.gradient}; animation-delay: ${delay}s;">
-                        <div class="battle-header">
-                            <span class="battle-mode">${b.mode}</span>
-                        </div>
-                        <div class="battle-teams">
-                            <div class="team">
-                                ${b.team1.map(p => `
-                                    <div class="team-player" onclick="viewProfile('${p.nick}')">
-                                        <div class="mini-avatar" style="background: ${getAvatarColor(p.nick)};"></div>
-                                        <span class="nick">${p.nick}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="vs-label">${t('vs')}</div>
-                            <div class="team right">
-                                ${b.team2.map(p => `
-                                    <div class="team-player" onclick="viewProfile('${p.nick}')">
-                                        <div class="mini-avatar" style="background: ${getAvatarColor(p.nick)};"></div>
-                                        <span class="nick">${p.nick}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        ${b.rounds.length > 0 ? `<div class="battle-rounds">` : ''}
-                        ${b.rounds.map((r, idx) => `
-                            <div class="round">
-                                <span class="round-content">
-                                    <span>${t('round')} ${idx+1}</span>
-                                    <span class="r-result ${r.result ? 'win' : 'loss'}">${r.result ? t('battle_win') : t('battle_loss')}</span>
-                                    <span class="r-time">${r.time}</span>
-                                </span>
-                            </div>
-                        `).join('')}
-                        ${b.rounds.length > 0 ? `</div>` : ''}
-                        <div class="battle-footer">
-                            <span class="battle-time">${b.timeAgo}</span>
-                            <span class="battle-result ${resultClass}">${resultText}</span>
-                        </div>
-                    </div>
-                `;
-            });
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        // ---- РЕНДЕР ТОПА ----
-        function renderLeaderboard(container) {
-            const fakePlayers = [];
-            for (let i = 1; i <= 100; i++) {
-                const elo = Math.floor(Math.random() * 8000) + 1000;
-                fakePlayers.push({ nickname: `Игрок${i}`, elo: elo });
-            }
-            fakePlayers.sort((a, b) => b.elo - a.elo);
-            let myIndex = -1;
-            if (userData) {
-                const found = fakePlayers.findIndex(p => p.nickname === userData.nickname);
-                if (found === -1) {
-                    const insertIdx = Math.floor(Math.random() * 100);
-                    fakePlayers.splice(insertIdx, 0, {
-                        nickname: userData.nickname,
-                        elo: userData.elo
-                    });
-                    fakePlayers.sort((a, b) => b.elo - a.elo);
-                    myIndex = fakePlayers.findIndex(p => p.nickname === userData.nickname);
-                } else {
-                    myIndex = found;
-                }
-            }
-
-            function getAvatarColor(nick) {
-                let hash = 0;
-                for (let i = 0; i < nick.length; i++) {
-                    hash = nick.charCodeAt(i) + ((hash << 5) - hash);
-                }
-                const hue = Math.abs(hash) % 360;
-                return `hsl(${hue}, 70%, 60%)`;
-            }
-
-            function getBannerColor(nick) {
-                let hash = 0;
-                for (let i = 0; i < nick.length; i++) {
-                    hash = nick.charCodeAt(i) + ((hash << 5) - hash);
-                }
-                const hue = Math.abs(hash) % 360;
-                return `hsl(${hue}, 60%, 50%)`;
-            }
-            let rows = '';
-            const displayCount = Math.min(100, fakePlayers.length);
-            for (let i = 0; i < displayCount; i++) {
-                const p = fakePlayers[i];
-                const isMe = userData && p.nickname === userData.nickname;
-                const rank = i + 1;
-                let rankClass = 'normal';
-                let rankColor = '#888';
-                if (rank === 1) { rankClass = 'gold';
-                    rankColor = '#ffd700'; } else if (rank === 2) { rankClass = 'silver';
-                    rankColor = '#c0c0c0'; } else if (rank === 3) { rankClass = 'bronze';
-                    rankColor = '#cd7f32'; }
-                const delay = i * 0.04;
-                const bannerColor = getBannerColor(p.nickname);
-                rows += `
-                    <div class="lb-row ${isMe ? 'me' : ''}" style="animation-delay: ${delay}s; background-image: linear-gradient(135deg, ${bannerColor}, ${darkenColor(bannerColor, 0.3)});" onclick="viewProfile('${p.nickname}')">
-                        <div class="glass-overlay"></div>
-                        <div class="rank-badge ${rankClass}" style="background: ${rankColor}; color: ${rankClass === 'gold' || rankClass === 'silver' ? '#000' : '#fff'};">${rank}</div>
-                        <div class="avatar-wrap">
-                            <div class="avatar" style="background: ${getAvatarColor(p.nickname)};"></div>
-                        </div>
-                        <span class="nick">${p.nickname}</span>
-                        <span class="elo-group">${p.elo} ELO</span>
-                    </div>
-                `;
-            }
-            let myPlaceDisplay = '';
-            let myPlaceRow = '';
-            if (userData) {
-                if (myIndex !== -1 && myIndex < 150) {
-                    myPlaceDisplay = `#${myIndex + 1}`;
-                } else {
-                    myPlaceDisplay = t('not_in_top');
-                }
-                const avatarColor = getAvatarColor(userData.nickname);
-                myPlaceRow = `
-                    <div class="my-rank-box" style="animation-delay: 0.5s;">
-                        <div style="display:flex; align-items:center; gap:8px; flex:1;">
-                            <div class="avatar-small" style="background: ${avatarColor};"></div>
-                            <span class="nick-small">${userData.nickname}</span>
-                        </div>
-                        <span class="elo-small">${userData.elo} ELO</span>
-                        <span style="margin-left:12px; font-weight:600; color:var(--text);">${myPlaceDisplay}</span>
-                    </div>
-                `;
-            } else {
-                myPlaceRow = `
-                    <div class="my-rank-box">
-                        <div class="label">${t('my_place')}</div>
-                        <div class="rank">${t('not_in_top')}</div>
-                    </div>
-                `;
-            }
-            container.innerHTML = `
-                <h2 style="margin-bottom:12px">${t('leaderboard_title')}</h2>
-                <div class="leaderboard-list">${rows}</div>
-                ${myPlaceRow}
             `;
+            document.body.appendChild(modal);
+            const input = modal.querySelector('#joinCodeInput');
+            input.focus();
+            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmJoin(); });
+            window._joinModal = modal;
         }
 
-        // ---- РЕНДЕР НАСТРОЕК ----
+        function closeJoinModal() {
+            if (window._joinModal) {
+                window._joinModal.remove();
+                window._joinModal = null;
+            }
+        }
+
+        async function confirmJoin() {
+            const input = document.getElementById('joinCodeInput');
+            if (!input) return;
+            const code = input.value.trim().toUpperCase();
+            if (!code) {
+                alert('Введите код комнаты');
+                return;
+            }
+            const success = await joinRoom(code);
+            if (success) closeJoinModal();
+        }
+
+        function startTournamentSearch(mode) {
+            if (currentRoomId) {
+                const room = api.getRoom(currentRoomId); // не async, но для заглушки
+                // В реальности нужно проверить, что пользователь капитан, но уже есть в интерфейсе.
+                alert(`${t('rooms_search_started')} (${mode})`);
+            } else {
+                alert(`Поиск турнира ${mode} начат!`);
+            }
+        }
+
+        // ===== Рендер настроек =====
         function renderSettings(container) {
             if (!container.querySelector('.settings-container')) {
                 container.innerHTML = `
@@ -1895,30 +1300,35 @@
                     </div>
                 `;
                 container.querySelectorAll('.select-option').forEach(el => {
-                    el.onclick = () => {
+                    el.onclick = async () => {
                         if (el.dataset.lang) {
                             userSettings.language = el.dataset.lang;
+                            await api.updateProfile(userData.id, { language: userSettings.language });
                             updateLanguage();
                             renderSettings(container);
                         }
                         if (el.dataset.theme) {
                             userSettings.theme = el.dataset.theme;
+                            await api.updateProfile(userData.id, { theme: userSettings.theme });
                             applyThemeAndColor();
                             renderSettings(container);
                         }
                     };
                 });
-                document.getElementById('toggleSound').onclick = () => {
+                document.getElementById('toggleSound').onclick = async () => {
                     userSettings.sound = !userSettings.sound;
+                    await api.updateProfile(userData.id, { sound: userSettings.sound });
                     renderSettings(container);
                 };
-                document.getElementById('toggleNotif').onclick = () => {
+                document.getElementById('toggleNotif').onclick = async () => {
                     userSettings.notifications = !userSettings.notifications;
+                    await api.updateProfile(userData.id, { notifications: userSettings.notifications });
                     renderSettings(container);
                 };
                 container.querySelectorAll('.color-dot').forEach(dot => {
-                    dot.onclick = () => {
+                    dot.onclick = async () => {
                         userSettings.colorTheme = dot.dataset.color;
+                        await api.updateProfile(userData.id, { color_theme: userSettings.colorTheme });
                         applyThemeAndColor();
                         renderSettings(container);
                     };
@@ -1941,7 +1351,7 @@
             }
         }
 
-        // ---- РЕНДЕР СМЕНЫ ПАРОЛЯ ----
+        // ===== Рендер смены пароля =====
         function renderChangePassword(container) {
             container.innerHTML = `
                 <div>
@@ -1954,7 +1364,7 @@
                     <button class="btn danger" id="chBack" style="margin-top:8px">${t('back')}</button>
                 </div>
             `;
-            document.getElementById('chSubmit').onclick = () => {
+            document.getElementById('chSubmit').onclick = async () => {
                 const o = document.getElementById('oldPwd').value.trim();
                 const n1 = document.getElementById('newPwd').value.trim();
                 const n2 = document.getElementById('newPwd2').value.trim();
@@ -1965,58 +1375,40 @@
                 if (!o || !n1 || !n2) { err.textContent = t('fill_all'); return; }
                 if (n1.length < 6) { err.textContent = t('min_6'); return; }
                 if (n1 !== n2) { err.textContent = t('passwords_not_match'); return; }
-                // Вместо моковой смены вызываем API
-                changePassword(o, n1);
+                const result = await api.changePassword(userData.id, o, n1);
+                if (result.ok) {
+                    suc.textContent = t('password_changed');
+                } else {
+                    err.textContent = result.error || 'Ошибка';
+                }
             };
             document.getElementById('chBack').onclick = () => showTab('profile');
         }
 
-        // ---- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ПРОФИЛЯ ----
-        function editCustomBanner() {
-            if (!userData || userData.bannerId !== 'custom') return;
-            const inp = document.createElement('input');
-            inp.type = 'file';
-            inp.accept = 'image/*';
-            inp.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    userData.customBannerUrl = ev.target.result;
-                    renderProfile();
-                };
-                reader.readAsDataURL(file);
-            };
-            inp.click();
-        }
-
-        function openBannerModal() {
+        // ===== Баннеры (модальное окно) =====
+        async function openBannerModal() {
             const modal = document.getElementById('bannerModal');
             modal.classList.add('visible');
-            renderBannerGrid();
+            await renderBannerGrid();
         }
 
         function closeBannerModal() {
             document.getElementById('bannerModal').classList.remove('visible');
         }
 
-        function renderBannerGrid() {
+        async function renderBannerGrid() {
             const grid = document.getElementById('bannerGrid');
+            const userBanners = await api.getBanners(); // список доступных баннеров
+            // Пока используем статические данные, но можно заменить на userBanners
             let html = '';
             bannerData.forEach(b => {
                 const selected = userData.bannerId === b.id;
                 const isCustom = b.type === 'custom';
                 let previewStyle = '';
                 if (isCustom) {
-                    if (userData.customBannerUrl) {
-                        previewStyle =
-                            `background-image: url(${userData.customBannerUrl}); background-size: cover; background-position: center;`;
-                    } else {
-                        previewStyle = `background: linear-gradient(135deg, #ccc, #999);`;
-                    }
+                    previewStyle = `background: linear-gradient(135deg, #ccc, #999);`;
                 } else {
-                    previewStyle =
-                        `background: linear-gradient(135deg, ${b.color}, ${darkenColor(b.color, 0.3)});`;
+                    previewStyle = `background: linear-gradient(135deg, ${b.color}, ${darkenColor(b.color, 0.3)});`;
                 }
                 const name = t(b.nameKey);
                 html += `
@@ -2029,135 +1421,64 @@
             });
             grid.innerHTML = html;
             grid.querySelectorAll('.modal-banner-item').forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', async function() {
                     const id = this.dataset.id;
                     if (id === 'custom') {
-                        if (!userData.customBannerUrl) {
-                            editCustomBanner();
-                        }
+                        // Загружаем свой баннер
+                        const inp = document.createElement('input');
+                        inp.type = 'file';
+                        inp.accept = 'image/*';
+                        inp.onchange = async (e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            const formData = new FormData();
+                            formData.append('user_id', userData.id);
+                            formData.append('banner', file);
+                            const result = await api.uploadBanner(userData.id, formData);
+                            if (result.bannerUrl) {
+                                userData.bannerUrl = result.bannerUrl;
+                                userData.bannerId = 'custom';
+                                renderBannerGrid();
+                                renderProfile(document.querySelector('.tab-content-inner'));
+                                closeBannerModal();
+                            }
+                        };
+                        inp.click();
+                    } else {
+                        await api.selectBanner(userData.id, id);
+                        userData.bannerId = id;
+                        renderBannerGrid();
+                        renderProfile(document.querySelector('.tab-content-inner'));
+                        closeBannerModal();
                     }
-                    userData.bannerId = id;
-                    renderBannerGrid();
-                    renderProfile();
-                    closeBannerModal();
                 });
             });
         }
 
-        function uploadAvatar() {
+        async function editCustomBanner() {
+            // Аналогично uploadBanner, но для модального окна
             const inp = document.createElement('input');
             inp.type = 'file';
             inp.accept = 'image/*';
-            inp.onchange = e => {
-                const f = e.target.files[0];
-                if (!f || !userData) return;
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    userData.avatarUrl = ev.target.result;
-                    renderProfile();
-                };
-                reader.readAsDataURL(f);
+            inp.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const formData = new FormData();
+                formData.append('user_id', userData.id);
+                formData.append('banner', file);
+                const result = await api.uploadBanner(userData.id, formData);
+                if (result.bannerUrl) {
+                    userData.bannerUrl = result.bannerUrl;
+                    userData.bannerId = 'custom';
+                    renderBannerGrid();
+                    renderProfile(document.querySelector('.tab-content-inner'));
+                    closeBannerModal();
+                }
             };
             inp.click();
         }
 
-        function editDescription() {
-            if (!userData) return;
-            const content = document.getElementById('tabContent');
-            const descBox = content.querySelector('.description-box');
-            if (!descBox) return;
-            const displaySpan = descBox.querySelector('#descDisplay');
-            if (!displaySpan) return;
-            const textarea = document.createElement('textarea');
-            textarea.className = 'textarea';
-            textarea.value = userData.description || '';
-            textarea.id = 'descEdit';
-            textarea.style.width = '100%';
-            textarea.style.minHeight = '60px';
-            textarea.style.marginTop = '8px';
-            textarea.placeholder = t('edit_description');
-            textarea.maxLength = 1000;
-            textarea.addEventListener('input', () => {
-                textarea.style.height = 'auto';
-                textarea.style.height = textarea.scrollHeight + 'px';
-            });
-            displaySpan.replaceWith(textarea);
-            textarea.focus();
-            textarea.select();
-            const saveBtn = document.createElement('button');
-            saveBtn.className = 'btn primary';
-            saveBtn.textContent = 'Сохранить';
-            saveBtn.style.marginTop = '8px';
-            saveBtn.style.width = 'auto';
-            saveBtn.style.padding = '6px 16px';
-            saveBtn.style.display = 'inline-block';
-            saveBtn.onclick = () => {
-                const val = textarea.value.trim();
-                if (val !== '') {
-                    userData.description = val;
-                } else {
-                    userData.description = t('description_empty');
-                }
-                renderProfile();
-            };
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'btn danger';
-            cancelBtn.textContent = t('back');
-            cancelBtn.style.marginTop = '8px';
-            cancelBtn.style.marginLeft = '8px';
-            cancelBtn.style.width = 'auto';
-            cancelBtn.style.padding = '6px 16px';
-            cancelBtn.style.display = 'inline-block';
-            cancelBtn.onclick = () => {
-                renderProfile();
-            };
-            descBox.appendChild(saveBtn);
-            descBox.appendChild(cancelBtn);
-            setTimeout(() => {
-                textarea.style.height = 'auto';
-                textarea.style.height = textarea.scrollHeight + 'px';
-            }, 0);
-        }
-
-        function viewProfile(nick) {
-            const fakeProfile = {
-                name: nick,
-                tag: `#${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-                description: 'Любитель бравла, играет с друзьями.',
-                elo: Math.floor(Math.random() * 8000) + 1000,
-                wins: Math.floor(Math.random() * 500),
-                losses: Math.floor(Math.random() * 500),
-                games: Math.floor(Math.random() * 1000) + 500,
-                winrate: (Math.random() * 20 + 40).toFixed(1),
-                reg_date: '31.07.2026',
-                id: Math.floor(Math.random() * 100000),
-                topRank: Math.floor(Math.random() * 150) + 1,
-                avatar: `hsl(${Math.random() * 360}, 70%, 60%)`,
-                banner: `linear-gradient(135deg, ${['#e94560','#3b82f6','#f59e0b','#10b981','#8b5cf6'][Math.floor(Math.random()*5)]}, ${['#c0392b','#1d4ed8','#d97706','#047857','#6d28d9'][Math.floor(Math.random()*5)]})`
-            };
-            const modal = document.getElementById('profileModal');
-            modal.classList.add('visible');
-            document.getElementById('modalBanner').style.background = fakeProfile.banner;
-            document.getElementById('modalAvatar').style.background = fakeProfile.avatar;
-            document.getElementById('modalName').textContent = fakeProfile.name;
-            document.getElementById('modalTag').textContent = fakeProfile.tag;
-            document.getElementById('modalDesc').textContent = fakeProfile.description;
-            document.getElementById('modalStats').innerHTML = `
-                <div class="stat-row"><span class="stat-label">${t('id')}</span><span class="stat-value">#${fakeProfile.id}</span></div>
-                <div class="stat-row"><span class="stat-label">${t('top_place')}</span><span class="stat-value">#${fakeProfile.topRank}</span></div>
-                <div class="stat-row"><span class="stat-label">${t('reg_date')}</span><span class="stat-value">${fakeProfile.reg_date}</span></div>
-                <div class="stat-row"><span class="stat-label">${t('winrate')}</span><span class="stat-value">${fakeProfile.winrate}%</span></div>
-                <div class="stat-row"><span class="stat-label">${t('games_played')}</span><span class="stat-value">${fakeProfile.games}</span></div>
-                <div class="stat-row"><span class="stat-label">${t('wins')}</span><span class="stat-value">${fakeProfile.wins}</span></div>
-                <div class="stat-row"><span class="stat-label">${t('losses')}</span><span class="stat-value">${fakeProfile.losses}</span></div>
-            `;
-        }
-
-        function closeProfileModal() {
-            document.getElementById('profileModal').classList.remove('visible');
-        }
-
-        // ---- ОСНОВНЫЕ ФУНКЦИИ АУТЕНТИФИКАЦИИ (заменены на API) ----
+        // ===== Аутентификация и верификация =====
         async function login() {
             const c = document.getElementById('login_cred').value.trim();
             const p = document.getElementById('login_password').value.trim();
@@ -2165,25 +1486,18 @@
             if (!c || !p) { err.textContent = t('fill_all'); return; }
             err.textContent = '';
             try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ login: c, password: p })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    userData = data;
-                    if (!userData.verified) {
-                        showVerify();
-                    } else {
-                        generateAllUsers();
-                        generateFriendsData();
-                        showMain();
-                    }
-                } else {
-                    err.textContent = data.error || t('account_not_found');
-                }
-            } catch (e) {
+                const data = await api.login(c, p);
+                if (data.error) { err.textContent = data.error; return; }
+                userData = data;
+                userSettings.language = userData.language || 'ru';
+                userSettings.theme = userData.theme || 'light';
+                userSettings.sound = userData.sound !== false;
+                userSettings.notifications = userData.notifications !== false;
+                userSettings.colorTheme = userData.color_theme || '#e94560';
+                applyThemeAndColor();
+                updateLanguage();
+                if (!userData.verified) showVerify(); else showMain();
+            } catch(e) {
                 err.textContent = 'Ошибка сети';
             }
         }
@@ -2194,26 +1508,18 @@
             const e = document.getElementById('reg_email').value.trim();
             const p = document.getElementById('reg_password').value.trim();
             const err = document.getElementById('reg_error');
-            if (!n || !t || !e || !p) { err.textContent = t('fill_all'); return; }
-            if (n.length < 3) { err.textContent = t('nickname_min'); return; }
+            if (!n||!t||!e||!p) { err.textContent = t('fill_all'); return; }
+            if (n.length<3) { err.textContent = t('nickname_min'); return; }
             if (!t.startsWith('#')) { err.textContent = t('tag_starts_with'); return; }
-            if (!e.includes('@') || !e.includes('.')) { err.textContent = t('invalid_email'); return; }
-            if (p.length < 6) { err.textContent = t('password_min'); return; }
+            if (!e.includes('@')||!e.includes('.')) { err.textContent = t('invalid_email'); return; }
+            if (p.length<6) { err.textContent = t('password_min'); return; }
             err.textContent = '';
             try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nickname: n, tag: t, email: e, password: p })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    alert(t('register_sent'));
-                    showLogin();
-                } else {
-                    err.textContent = data.error || 'Ошибка регистрации';
-                }
-            } catch (ex) {
+                const data = await api.register(n, t, e, p);
+                if (data.error) { err.textContent = data.error; return; }
+                alert(t('register_sent'));
+                showLogin();
+            } catch(ex) {
                 err.textContent = 'Ошибка сети';
             }
         }
@@ -2225,341 +1531,32 @@
 
         document.getElementById('verifyBtn').onclick = async () => {
             if (!userData) return;
-            try {
-                const res = await fetch('/api/verify-club', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tag: userData.brawl_tag, user_id: userData.id })
-                });
-                const data = await res.json();
-                if (data.verified) {
-                    userData.verified = true;
-                    alert('Аккаунт подтверждён!');
-                    generateAllUsers();
-                    generateFriendsData();
-                    showMain();
-                } else {
-                    alert('Вы не найдены в клане. Проверьте и попробуйте снова.');
-                }
-            } catch (ex) {
-                alert('Ошибка сети');
+            const data = await api.verifyClub(userData.brawl_tag, userData.id);
+            if (data.verified) {
+                userData.verified = true;
+                alert('Аккаунт подтверждён!');
+                showMain();
+            } else {
+                alert('Вы не найдены в клане. Проверьте и попробуйте снова.');
             }
         };
-
-        async function changePassword(oldPwd, newPwd) {
-            if (!userData) return;
-            const res = await fetch('/api/change-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userData.id, old_password: oldPwd, new_password: newPwd })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert('Пароль изменён!');
-                renderChangePassword(document.querySelector('.tab-content-inner'));
-            } else {
-                alert(data.error || 'Ошибка');
-            }
-        }
 
         function resetPassword() {
             const e = document.getElementById('reset_email').value.trim();
             const err = document.getElementById('reset_error');
             const suc = document.getElementById('reset_success');
-            if (!e) { err.textContent = t('enter_email');
-                suc.textContent = ''; return; }
+            if (!e) { err.textContent = t('enter_email'); suc.textContent = ''; return; }
             err.textContent = '';
-            // Здесь можно вызвать API для сброса пароля, но пока оставим заглушку
+            // Здесь можно вызвать API сброса, но пока заглушка
             suc.textContent = t('reset_sent') + e;
         }
 
         function logout() {
             userData = null;
-            friends = [];
-            friendRequests = [];
-            allUsers = [];
-            sentRequests = [];
+            if (chatInterval) clearInterval(chatInterval);
+            currentRoomId = null;
             showLogin();
         }
-
-        // ============================================================
-        // ===== МОДУЛЬ ПОИСКА (турниры + приватные комнаты + чат) =====
-        // ============================================================
-
-        function generateRoomCode() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-
-        function createRoom() {
-            if (currentRoomId) return;
-            const code = generateRoomCode();
-            const room = {
-                id: Date.now().toString(36),
-                code: code,
-                host: currentPlayer.name,
-                members: [{ ...currentPlayer, isHost: true }],
-                messages: [],
-                createdAt: Date.now()
-            };
-            rooms.push(room);
-            currentRoomId = room.id;
-            renderSearch(document.querySelector('.tab-content-inner'));
-        }
-
-        function joinRoom(code) {
-            if (currentRoomId) return;
-            const clean = code.trim().toUpperCase();
-            const room = rooms.find(r => r.code === clean);
-            if (!room) {
-                alert(t('rooms_room_not_found'));
-                return false;
-            }
-            if (room.members.length >= 3) {
-                alert(t('rooms_full'));
-                return false;
-            }
-            if (room.members.find(m => m.name === currentPlayer.name)) {
-                alert(t('rooms_already_in'));
-                return false;
-            }
-            room.members.push({ ...currentPlayer, isHost: false });
-            currentRoomId = room.id;
-            renderSearch(document.querySelector('.tab-content-inner'));
-            return true;
-        }
-
-        function leaveRoom() {
-            if (!currentRoomId) return;
-            const room = rooms.find(r => r.id === currentRoomId);
-            if (!room) { currentRoomId = null;
-                renderSearch(document.querySelector('.tab-content-inner')); return; }
-            room.members = room.members.filter(m => m.name !== currentPlayer.name);
-            if (room.members.length === 0) {
-                rooms = rooms.filter(r => r.id !== currentRoomId);
-            } else {
-                const oldHost = room.members.find(m => m.name === room.host);
-                if (!oldHost) {
-                    const newHost = room.members[0];
-                    if (newHost) {
-                        room.host = newHost.name;
-                        newHost.isHost = true;
-                    }
-                }
-            }
-            currentRoomId = null;
-            renderSearch(document.querySelector('.tab-content-inner'));
-        }
-
-        function disbandRoom() {
-            if (!currentRoomId) return;
-            const room = rooms.find(r => r.id === currentRoomId);
-            if (!room) { currentRoomId = null;
-                renderSearch(document.querySelector('.tab-content-inner')); return; }
-            if (room.host !== currentPlayer.name) {
-                alert(t('rooms_only_host'));
-                return;
-            }
-            rooms = rooms.filter(r => r.id !== currentRoomId);
-            currentRoomId = null;
-            renderSearch(document.querySelector('.tab-content-inner'));
-        }
-
-        function startTournamentSearch(mode) {
-            // Запуск поиска турнира
-            if (currentRoomId) {
-                const room = rooms.find(r => r.id === currentRoomId);
-                if (!room) return;
-                if (room.host !== currentPlayer.name) {
-                    alert(t('rooms_ready_disabled'));
-                    return;
-                }
-                // Капитан запускает поиск для всей команды
-                alert(`${t('rooms_search_started')} (${mode})`);
-                // Здесь будет реальный поиск
-            } else {
-                // Одиночный поиск
-                alert(`Поиск турнира ${mode} начат!`);
-            }
-        }
-
-        function sendChatMessage() {
-            const room = rooms.find(r => r.id === currentRoomId);
-            if (!room) return;
-            const input = document.getElementById('chatInput');
-            if (!input) return;
-            const text = input.value.trim();
-            if (!text) return;
-            room.messages.push({
-                sender: currentPlayer.name,
-                text: text,
-                time: Date.now()
-            });
-            input.value = '';
-            renderSearch(document.querySelector('.tab-content-inner'));
-            const chatMessages = document.getElementById('chatMessages');
-            if (chatMessages) {
-                setTimeout(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }, 50);
-            }
-        }
-
-        // ---- РЕНДЕР ПОИСКА ----
-        function renderSearch(container) {
-            const currentRoom = rooms.find(r => r.id === currentRoomId);
-
-            const glassClass = userSettings.theme === 'dark' ? 'rooms-glass dark' : 'rooms-glass';
-
-            // Левая часть: код комнаты и кнопки
-            let leftHtml = '';
-            if (currentRoom) {
-                const isHost = currentRoom.host === currentPlayer.name;
-                leftHtml = `
-                    <div class="room-code-block">
-                        <span class="code-label">${t('rooms_code')}</span>
-                        <span class="code">${currentRoom.code}</span>
-                        <button class="btn btn-danger" onclick="${isHost ? 'disbandRoom()' : 'leaveRoom()'}">
-                            ${isHost ? t('rooms_disband') : t('rooms_leave')}
-                        </button>
-                    </div>
-                `;
-            } else {
-                leftHtml = `
-                    <div class="rooms-actions">
-                        <button class="btn btn-primary" onclick="createRoom()">${t('rooms_create')}</button>
-                        <button class="btn btn-outline" onclick="openJoinModal()">${t('rooms_join')}</button>
-                    </div>
-                `;
-            }
-
-            // Правая часть: участники
-            let membersHtml = '';
-            if (currentRoom) {
-                membersHtml = currentRoom.members.map(m => {
-                    const isHost = m.name === currentRoom.host;
-                    return `
-                        <div class="member-item">
-                            <div class="avatar" style="background:${m.avatarColor || '#2a2a3e'};">
-                                ${isHost ? '<span class="crown">♛</span>' : ''}
-                                ${m.name[0]}
-                            </div>
-                            <div>
-                                <div class="member-name">${m.name}</div>
-                                <div class="member-tag">${m.tag || '#??????'}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                membersHtml = `<div class="rooms-empty">${t('rooms_not_in_room')}</div>`;
-            }
-
-            // Чат
-            let chatHtml = '';
-            if (currentRoom) {
-                const messages = currentRoom.messages;
-                const msgHtml = messages.map(m => `
-                    <div class="msg"><span class="sender">${m.sender}:</span> ${m.text}</div>
-                `).join('');
-                chatHtml = `
-                    <div class="chat-area">
-                        <div class="chat-title">${t('chat_title')}</div>
-                        <div class="chat-messages" id="chatMessages">${msgHtml}</div>
-                        <div class="chat-input-row">
-                            <input type="text" id="chatInput" placeholder="${t('chat_placeholder')}" onkeydown="if(event.key==='Enter') sendChatMessage()">
-                            <button onclick="sendChatMessage()">${t('chat_send')}</button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Турнирные карточки: 3x3 доступна в комнате, ШД — только вне комнаты
-            const inRoom = !!currentRoom;
-            container.innerHTML = `
-                <div class="search-container">
-                    <div class="search-header">
-                        <h2 data-i18n="search_title">Поиск</h2>
-                    </div>
-                    <div class="tournament-cards">
-                        <div class="tournament-card type-3x3" onclick="startTournamentSearch('3x3')">
-                            <div class="title">${t('search_3x3')}</div>
-                            <div class="sub">${t('search_3x3_desc')}</div>
-                            <div class="arrow">›</div>
-                        </div>
-                        <div class="tournament-card type-sd ${inRoom ? 'disabled' : ''}" onclick="${inRoom ? '' : `startTournamentSearch('sd')`}">
-                            <div class="title">${t('search_sd')}</div>
-                            <div class="sub">${t('search_sd_desc')}</div>
-                            <div class="arrow">›</div>
-                            ${inRoom ? '<div style="position:absolute;bottom:8px;left:0;right:0;font-size:11px;color:var(--info-label);">Доступно только вне комнаты</div>' : ''}
-                        </div>
-                    </div>
-                    <div class="rooms-section">
-                        <div class="rooms-section-title">${t('rooms_section')}</div>
-                        <div class="${glassClass}" style="display:flex; flex-direction:column; gap:16px;">
-                            <div style="display:flex; gap:16px; flex-wrap:wrap;">
-                                <div style="flex:1; min-width:140px;">
-                                    ${leftHtml}
-                                </div>
-                                <div style="flex:1; min-width:140px; border-left:1px solid rgba(255,255,255,0.15); padding-left:14px;">
-                                    <div style="font-size:13px; font-weight:600; color:var(--info-label); margin-bottom:8px;">${t('rooms_members')}</div>
-                                    <div class="members-list">${membersHtml}</div>
-                                </div>
-                            </div>
-                            ${chatHtml}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function openJoinModal() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay rooms-modal visible';
-            modal.innerHTML = `
-                <div class="modal-box">
-                    <h3>${t('rooms_enter_code')}</h3>
-                    <input type="text" id="joinCodeInput" placeholder="ABCDEF" maxlength="6" style="text-transform:uppercase;">
-                    <div class="modal-actions">
-                        <button class="btn-secondary" onclick="closeJoinModal()">${t('rooms_cancel')}</button>
-                        <button class="btn-primary" onclick="confirmJoin()">${t('rooms_confirm')}</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            const input = modal.querySelector('#joinCodeInput');
-            input.focus();
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') confirmJoin();
-            });
-            window._joinModal = modal;
-        }
-
-        function closeJoinModal() {
-            if (window._joinModal) {
-                window._joinModal.remove();
-                window._joinModal = null;
-            }
-        }
-
-        function confirmJoin() {
-            const input = document.getElementById('joinCodeInput');
-            if (!input) return;
-            const code = input.value.trim().toUpperCase();
-            if (!code) {
-                alert('Введите код комнаты');
-                return;
-            }
-            const success = joinRoom(code);
-            if (success) {
-                closeJoinModal();
-            }
-        }
-
-        // ---- ОСТАЛЬНЫЕ ФУНКЦИИ (БАННЕРЫ И Т.Д.) ----
-        // (уже реализованы выше)
 
         // ===== Инициализация =====
         showLogin();
@@ -2571,18 +1568,6 @@
                 el.placeholder = t(placeholderKey);
             }
         });
-
-        // Создаём одну тестовую комнату для демо
-        const demoRoom = {
-            id: 'demo1',
-            code: 'ABC123',
-            host: 'Adykat',
-            members: [{ ...currentPlayer, isHost: true }],
-            messages: [],
-            createdAt: Date.now()
-        };
-        rooms.push(demoRoom);
-        currentRoomId = demoRoom.id;
     </script>
 </body>
 </html>
