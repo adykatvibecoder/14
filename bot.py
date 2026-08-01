@@ -9,7 +9,7 @@ from config import BOT_TOKEN, WEBAPP_URL
 from database.db import init_db
 from handlers.auth import router as auth_router
 from handlers.profile import router as profile_router
-from api.auth import login, register, get_profile, verify_club
+from api.auth import login, register, get_profile, verify_club, change_password
 import os
 
 bot = Bot(
@@ -40,6 +40,7 @@ app.router.add_route('POST', '/api/login', login)
 app.router.add_route('POST', '/api/register', register)
 app.router.add_route('GET', '/api/profile', get_profile)
 app.router.add_route('POST', '/api/verify-club', verify_club)
+app.router.add_route('POST', '/api/change-password', change_password)
 
 # Раздача Mini App (webapp/index.html)
 async def webapp_handler(request):
