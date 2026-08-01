@@ -22,16 +22,18 @@ dp.include_router(profile_router)
 
 app = web.Application()
 
-@web.middleware
-async def cors_middleware(request, handler):
-    if request.method == 'OPTIONS':
-        response = web.Response(status=204)
-    else:
-        response = await handler(request)
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    return response
+# Правильный CORS middleware
+async def cors_middleware(app_instance, handler):
+    async def middleware_handler(request):
+        if request.method == 'OPTIONS':
+            response = web.Response(status=204)
+        else:
+            response = await handler(request)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
+    return middleware_handler
 
 app.middlewares.append(cors_middleware)
 
