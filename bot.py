@@ -7,7 +7,6 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from config import BOT_TOKEN, WEBAPP_URL
 from database.db import init_db
-from handlers.auth import router as auth_router
 from handlers.profile import router as profile_router
 from api.auth import login, register, get_profile, verify_club, change_password
 import os
@@ -17,12 +16,11 @@ bot = Bot(
     default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 )
 dp = Dispatcher()
-dp.include_router(auth_router)
-dp.include_router(profile_router)
+dp.include_router(profile_router)  # Если в profile.py есть что-то полезное; если нет — можно убрать
 
 app = web.Application()
 
-# Правильный CORS middleware
+# CORS middleware (правильный вариант)
 async def cors_middleware(app_instance, handler):
     async def middleware_handler(request):
         if request.method == 'OPTIONS':
@@ -63,9 +61,7 @@ async def cmd_start(message: Message, state: FSMContext = None):
         await state.clear()
     kb = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))],
-            [KeyboardButton(text="Профиль")],
-            [KeyboardButton(text="Регистрация"), KeyboardButton(text="Вход")]
+            [KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))]
         ],
         resize_keyboard=True
     )
