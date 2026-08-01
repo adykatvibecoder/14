@@ -1,4 +1,10 @@
-import json, hashlib, os, uuid, random, string
+import json
+import hashlib
+import os
+import uuid
+import random
+import string
+import base64
 from aiohttp import web
 from sqlalchemy import func
 from database.db import Session
@@ -17,22 +23,33 @@ def hash_password(password: str) -> str:
 
 def user_profile(u):
     return {
-        "id": u.id, "nickname": u.nickname, "brawl_tag": u.brawl_tag, "brawl_name": u.brawl_name,
-        "elo": u.elo, "wins": u.wins, "losses": u.losses,
+        "id": u.id,
+        "nickname": u.nickname,
+        "brawl_tag": u.brawl_tag,
+        "brawl_name": u.brawl_name,
+        "elo": u.elo,
+        "wins": u.wins,
+        "losses": u.losses,
         "games": u.wins + u.losses,
         "winrate": round(u.wins / (u.wins + u.losses) * 100, 1) if (u.wins + u.losses) > 0 else 0,
         "reg_date": u.created_at.strftime("%d.%m.%Y") if u.created_at else "—",
-        "description": u.description or "", "verified": u.verified,
-        "avatarUrl": u.avatar_url or "", "bannerUrl": u.banner_url or "",
-        "language": u.language or "ru", "theme": u.theme or "light",
-        "sound": u.sound, "notifications": u.notifications,
+        "description": u.description or "",
+        "verified": u.verified,
+        "avatarUrl": u.avatar_url or "",
+        "bannerUrl": u.banner_url or "",
+        "language": u.language or "ru",
+        "theme": u.theme or "light",
+        "sound": u.sound,
+        "notifications": u.notifications,
         "color_theme": u.color_theme or "#e94560"
     }
 
 # ------------------- auth -------------------
 async def login(request):
-    try: data = await request.json()
-    except: return web.json_response({"error": "Invalid JSON"}, status=400)
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     login_raw = data.get("login", "")
     password = data.get("password", "")
     if not login_raw or not password:
@@ -52,26 +69,35 @@ async def login(request):
     return web.json_response(profile)
 
 async def register(request):
-    try: data = await request.json()
-    except: return web.json_response({"error": "Invalid JSON"}, status=400)
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     nickname = data.get("nickname")
     tag = data.get("tag")
     email = data.get("email")
     password = data.get("password")
     if not all([nickname, tag, email, password]):
         return web.json_response({"error": "All fields required"}, status=400)
-    if len(nickname) < 3: return web.json_response({"error": "Nickname too short"}, status=400)
-    if not tag.startswith("#"): return web.json_response({"error": "Tag must start with #"}, status=400)
-    if "@" not in email or "." not in email: return web.json_response({"error": "Invalid email"}, status=400)
-    if len(password) < 6: return web.json_response({"error": "Password too short"}, status=400)
+    if len(nickname) < 3:
+        return web.json_response({"error": "Nickname too short"}, status=400)
+    if not tag.startswith("#"):
+        return web.json_response({"error": "Tag must start with #"}, status=400)
+    if "@" not in email or "." not in email:
+        return web.json_response({"error": "Invalid email"}, status=400)
+    if len(password) < 6:
+        return web.json_response({"error": "Password too short"}, status=400)
     session = Session()
     if session.query(User).filter((User.email == email) | (User.nickname == nickname) | (User.brawl_tag == tag)).first():
         session.close()
         return web.json_response({"error": "User already exists"}, status=409)
     user = User(
-        nickname=nickname, brawl_tag=tag, email=email,
+        nickname=nickname,
+        brawl_tag=tag,
+        email=email,
         password_hash=hash_password(password),
-        brawl_name=data.get("brawl_name", ""), verified=False
+        brawl_name=data.get("brawl_name", ""),
+        verified=False
     )
     session.add(user)
     session.commit()
@@ -80,7 +106,8 @@ async def register(request):
 
 async def get_profile(request):
     user_id = request.rel_url.query.get("user_id")
-    if not user_id: return web.json_response({"error": "user_id required"}, status=400)
+    if not user_id:
+        return web.json_response({"error": "user_id required"}, status=400)
     session = Session()
     user = session.query(User).filter_by(id=int(user_id)).first()
     if not user:
@@ -91,11 +118,14 @@ async def get_profile(request):
     return web.json_response(profile)
 
 async def verify_club(request):
-    try: data = await request.json()
-    except: return web.json_response({"error": "Invalid JSON"}, status=400)
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     tag = data.get("tag")
     user_id = data.get("user_id")
-    if not tag or not user_id: return web.json_response({"error": "tag and user_id required"}, status=400)
+    if not tag or not user_id:
+        return web.json_response({"error": "tag and user_id required"}, status=400)
     if is_tag_in_club(tag, VERIFY_CLUB_TAG):
         session = Session()
         user = session.query(User).filter_by(id=int(user_id)).first()
@@ -108,8 +138,10 @@ async def verify_club(request):
         return web.json_response({"success": False, "verified": False, "message": "Tag not found in club"})
 
 async def change_password(request):
-    try: data = await request.json()
-    except: return web.json_response({"error": "Invalid JSON"}, status=400)
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     user_id = data.get("user_id")
     old_password = data.get("old_password")
     new_password = data.get("new_password")
@@ -129,10 +161,13 @@ async def change_password(request):
     return web.json_response({"success": True})
 
 async def update_profile(request):
-    try: data = await request.json()
-    except: return web.json_response({"error": "Invalid JSON"}, status=400)
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     user_id = data.get("user_id")
-    if not user_id: return web.json_response({"error": "user_id required"}, status=400)
+    if not user_id:
+        return web.json_response({"error": "user_id required"}, status=400)
     session = Session()
     user = session.query(User).filter_by(id=int(user_id)).first()
     if not user:
@@ -154,8 +189,12 @@ async def get_leaderboard(request):
     result = []
     for i, u in enumerate(users, 1):
         result.append({
-            "rank": i, "id": u.id, "nickname": u.nickname, "brawl_tag": u.brawl_tag,
-            "elo": u.elo, "avatarUrl": u.avatar_url or ""
+            "rank": i,
+            "id": u.id,
+            "nickname": u.nickname,
+            "brawl_tag": u.brawl_tag,
+            "elo": u.elo,
+            "avatarUrl": u.avatar_url or ""
         })
     session.close()
     return web.json_response(result)
@@ -167,8 +206,10 @@ async def get_friends(request):
     sent = session.query(FriendRequest).filter(FriendRequest.from_user_id == user_id, FriendRequest.status == "accepted").all()
     received = session.query(FriendRequest).filter(FriendRequest.to_user_id == user_id, FriendRequest.status == "accepted").all()
     friends = []
-    for f in sent: friends.append(user_profile(f.to_user))
-    for f in received: friends.append(user_profile(f.from_user))
+    for f in sent:
+        friends.append(user_profile(f.to_user))
+    for f in received:
+        friends.append(user_profile(f.from_user))
     session.close()
     return web.json_response(friends)
 
@@ -176,7 +217,12 @@ async def get_friend_requests(request):
     user_id = int(request.rel_url.query.get("user_id"))
     session = Session()
     pending = session.query(FriendRequest).filter(FriendRequest.to_user_id == user_id, FriendRequest.status == "pending").all()
-    result = [{"request_id": fr.id, "from_user": user_profile(fr.from_user)} for fr in pending]
+    result = []
+    for fr in pending:
+        result.append({
+            "request_id": fr.id,
+            "from_user": user_profile(fr.from_user)
+        })
     session.close()
     return web.json_response(result)
 
@@ -184,7 +230,8 @@ async def send_friend_request(request):
     data = await request.json()
     from_id = data.get("from_user_id")
     to_id = data.get("to_user_id")
-    if not from_id or not to_id: return web.json_response({"error": "from_user_id and to_user_id required"}, status=400)
+    if not from_id or not to_id:
+        return web.json_response({"error": "from_user_id and to_user_id required"}, status=400)
     session = Session()
     existing = session.query(FriendRequest).filter(
         ((FriendRequest.from_user_id == from_id) & (FriendRequest.to_user_id == to_id)) |
@@ -249,7 +296,8 @@ def generate_room_code(session):
 async def create_room(request):
     data = await request.json()
     user_id = data.get("user_id")
-    if not user_id: return web.json_response({"error": "user_id required"}, status=400)
+    if not user_id:
+        return web.json_response({"error": "user_id required"}, status=400)
     session = Session()
     code = generate_room_code(session)
     room = Room(id=str(uuid.uuid4()), code=code, host_id=user_id)
@@ -265,7 +313,8 @@ async def join_room(request):
     data = await request.json()
     user_id = data.get("user_id")
     code = data.get("code")
-    if not user_id or not code: return web.json_response({"error": "user_id and code required"}, status=400)
+    if not user_id or not code:
+        return web.json_response({"error": "user_id and code required"}, status=400)
     session = Session()
     room = session.query(Room).filter_by(code=code.upper()).first()
     if not room:
@@ -287,7 +336,8 @@ async def leave_room(request):
     data = await request.json()
     user_id = data.get("user_id")
     room_id = data.get("room_id")
-    if not user_id or not room_id: return web.json_response({"error": "user_id and room_id required"}, status=400)
+    if not user_id or not room_id:
+        return web.json_response({"error": "user_id and room_id required"}, status=400)
     session = Session()
     member = session.query(RoomMember).filter_by(room_id=room_id, user_id=user_id).first()
     if member:
@@ -300,7 +350,8 @@ async def disband_room(request):
     data = await request.json()
     user_id = data.get("user_id")
     room_id = data.get("room_id")
-    if not user_id or not room_id: return web.json_response({"error": "user_id and room_id required"}, status=400)
+    if not user_id or not room_id:
+        return web.json_response({"error": "user_id and room_id required"}, status=400)
     session = Session()
     room = session.query(Room).filter_by(id=room_id).first()
     if not room or room.host_id != user_id:
@@ -322,12 +373,16 @@ async def get_room(request):
     for m in room.members:
         u = session.query(User).filter_by(id=m.user_id).first()
         members.append({
-            "user_id": u.id, "nickname": u.nickname, "brawl_tag": u.brawl_tag,
+            "user_id": u.id,
+            "nickname": u.nickname,
+            "brawl_tag": u.brawl_tag,
             "avatar_color": u.avatar_url or f"hsl({hash(u.nickname) % 360}, 70%, 60%)",
             "is_host": u.id == room.host_id
         })
     result = {
-        "id": room.id, "code": room.code, "host_id": room.host_id,
+        "id": room.id,
+        "code": room.code,
+        "host_id": room.host_id,
         "members": members
     }
     session.close()
@@ -339,7 +394,8 @@ async def send_message(request):
     room_id = data.get("room_id")
     user_id = data.get("user_id")
     text = data.get("text")
-    if not all([room_id, user_id, text]): return web.json_response({"error": "room_id, user_id, text required"}, status=400)
+    if not all([room_id, user_id, text]):
+        return web.json_response({"error": "room_id, user_id, text required"}, status=400)
     session = Session()
     member = session.query(RoomMember).filter_by(room_id=room_id, user_id=user_id).first()
     if not member:
@@ -356,23 +412,37 @@ async def get_messages(request):
     since = int(request.rel_url.query.get("since", "0"))
     session = Session()
     msgs = session.query(Message).filter(Message.room_id == room_id, Message.id > since).order_by(Message.id.asc()).all()
-    result = [{"id": m.id, "sender": m.sender.nickname, "text": m.text, "time": m.created_at.strftime("%H:%M") if m.created_at else ""} for m in msgs]
+    result = []
+    for m in msgs:
+        result.append({
+            "id": m.id,
+            "sender": m.sender.nickname,
+            "text": m.text,
+            "time": m.created_at.strftime("%H:%M") if m.created_at else ""
+        })
     session.close()
     return web.json_response(result)
 
 # ------------------- avatar / banner -------------------
 async def upload_avatar(request):
-    data = await request.json()
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     user_id = data.get("user_id")
     image_b64 = data.get("image")
-    if not user_id or not image_b64: return web.json_response({"error": "user_id and image required"}, status=400)
-    if image_b64.startswith("data:"): image_b64 = image_b64.split(",", 1)[1]
+    if not user_id or not image_b64:
+        return web.json_response({"error": "user_id and image required"}, status=400)
+    if image_b64.startswith("data:"):
+        image_b64 = image_b64.split(",", 1)[1]
     try:
-        img_bytes = __import__("base64").b64decode(image_b64)
-    except: return web.json_response({"error": "Invalid base64"}, status=400)
+        img_bytes = base64.b64decode(image_b64)
+    except:
+        return web.json_response({"error": "Invalid base64"}, status=400)
     filename = f"avatar_{user_id}.jpg"
     filepath = os.path.join(AVATAR_DIR, filename)
-    with open(filepath, "wb") as f: f.write(img_bytes)
+    with open(filepath, "wb") as f:
+        f.write(img_bytes)
     url = f"/static/avatars/{filename}"
     session = Session()
     user = session.query(User).filter_by(id=int(user_id)).first()
@@ -383,17 +453,24 @@ async def upload_avatar(request):
     return web.json_response({"success": True, "avatarUrl": url})
 
 async def upload_banner(request):
-    data = await request.json()
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
     user_id = data.get("user_id")
     image_b64 = data.get("image")
-    if not user_id or not image_b64: return web.json_response({"error": "user_id and image required"}, status=400)
-    if image_b64.startswith("data:"): image_b64 = image_b64.split(",", 1)[1]
+    if not user_id or not image_b64:
+        return web.json_response({"error": "user_id and image required"}, status=400)
+    if image_b64.startswith("data:"):
+        image_b64 = image_b64.split(",", 1)[1]
     try:
-        img_bytes = __import__("base64").b64decode(image_b64)
-    except: return web.json_response({"error": "Invalid base64"}, status=400)
+        img_bytes = base64.b64decode(image_b64)
+    except:
+        return web.json_response({"error": "Invalid base64"}, status=400)
     filename = f"banner_{user_id}.jpg"
     filepath = os.path.join(BANNER_DIR, filename)
-    with open(filepath, "wb") as f: f.write(img_bytes)
+    with open(filepath, "wb") as f:
+        f.write(img_bytes)
     url = f"/static/banners/{filename}"
     session = Session()
     user = session.query(User).filter_by(id=int(user_id)).first()
@@ -404,25 +481,20 @@ async def upload_banner(request):
     return web.json_response({"success": True, "bannerUrl": url})
 
 async def get_banners(request):
-    # Здесь можно вернуть список доступных баннеров (динамических или статических)
     return web.json_response([])
 
 async def select_banner(request):
     data = await request.json()
     user_id = data.get("user_id")
     banner_id = data.get("banner_id")
-    # сохранить id баннера в профиле (можно добавить поле banner_id)
     session = Session()
     user = session.query(User).filter_by(id=int(user_id)).first()
     if user:
-        # Предположим, что есть поле banner_id, или просто сохраняем как строку
-        # user.banner_id = banner_id
+        # Здесь можно сохранить banner_id в отдельное поле, если оно есть
         session.commit()
     session.close()
     return web.json_response({"success": True})
 
 # ------------------- battles (placeholder) -------------------
 async def get_battles(request):
-    user_id = request.rel_url.query.get("user_id")
-    # Вернуть список последних боёв из БД (пока пусто)
     return web.json_response([])
