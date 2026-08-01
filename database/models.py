@@ -6,7 +6,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    telegram_id = Column(Integer, unique=True, nullable=False)
+    telegram_id = Column(Integer, unique=True, nullable=True)   # теперь может быть NULL
     nickname = Column(String(50), unique=True, nullable=False)
     brawl_tag = Column(String(20), unique=True, nullable=False)
     brawl_name = Column(String(50))
