@@ -7,20 +7,17 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from config import BOT_TOKEN, WEBAPP_URL
 from database.db import init_db
+from handlers.auth import router as auth_router
 from handlers.profile import router as profile_router
-from api.auth import login, register, get_profile, verify_club, change_password
-import os
+from api.auth import *
 
-bot = Bot(
-    token=BOT_TOKEN,
-    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-)
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
-dp.include_router(profile_router)  # Если в profile.py есть что-то полезное; если нет — можно убрать
+dp.include_router(auth_router)
+dp.include_router(profile_router)
 
 app = web.Application()
 
-# CORS middleware (правильный вариант)
 async def cors_middleware(app_instance, handler):
     async def middleware_handler(request):
         if request.method == 'OPTIONS':
@@ -35,12 +32,35 @@ async def cors_middleware(app_instance, handler):
 
 app.middlewares.append(cors_middleware)
 
+# Auth
 app.router.add_route('POST', '/api/login', login)
 app.router.add_route('POST', '/api/register', register)
 app.router.add_route('GET', '/api/profile', get_profile)
 app.router.add_route('POST', '/api/verify-club', verify_club)
 app.router.add_route('POST', '/api/change-password', change_password)
+app.router.add_route('PUT', '/api/profile', update_profile)
 
+# Leaderboard
+app.router.add_route('GET', '/api/leaderboard', get_leaderboard)
+
+# Friends
+app.router.add_route('GET', '/api/friends', get_friends)
+app.router.add_route('GET', '/api/friend-requests', get_friend_requests)
+app.router.add_route('POST', '/api/friend-request', send_friend_request)
+app.router.add_route('POST', '/api/friend-request/accept', accept_friend_request)
+app.router.add_route('POST', '/api/friend-request/reject', reject_friend_request)
+
+# Rooms
+app.router.add_route('POST', '/api/rooms', create_room)
+app.router.add_route('POST', '/api/rooms/join', join_room)
+app.router.add_route('POST', '/api/rooms/leave', leave_room)
+app.router.add_route('DELETE', '/api/rooms', disband_room)
+
+# Chat
+app.router.add_route('POST', '/api/messages', send_message)
+app.router.add_route('GET', '/api/messages', get_messages)
+
+# Webapp
 async def webapp_handler(request):
     try:
         with open('webapp/index.html', 'r', encoding='utf-8') as f:
@@ -48,9 +68,14 @@ async def webapp_handler(request):
         return web.Response(text=html, content_type='text/html')
     except FileNotFoundError:
         return web.Response(text="App not found", status=404)
-
 app.router.add_route('GET', '/app', webapp_handler)
 
+# Static
+static_dir = os.path.join(os.getenv('DATA_DIR', '/app/data'))
+os.makedirs(static_dir, exist_ok=True)
+app.router.add_static('/static/', path=static_dir)
+
+# Root
 async def index(request):
     return web.json_response({"status": "ok", "service": "ESBrawlElite API"})
 app.router.add_route('GET', '/', index)
@@ -60,9 +85,7 @@ async def cmd_start(message: Message, state: FSMContext = None):
     if state:
         await state.clear()
     kb = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))]
-        ],
+        keyboard=[[KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))]],
         resize_keyboard=True
     )
     await message.answer(
