@@ -39,7 +39,12 @@ async def login(request):
         "description": user.description or "",
         "verified": user.verified,
         "avatarUrl": user.avatar_url or "",
-        "bannerUrl": user.banner_url or ""
+        "bannerUrl": user.banner_url or "",
+        "language": user.language or "ru",
+        "theme": user.theme or "light",
+        "sound": user.sound,
+        "notifications": user.notifications,
+        "color_theme": user.color_theme or "#e94560"
     }
     session.close()
     return web.json_response(profile)
@@ -67,8 +72,8 @@ async def register(request):
     if session.query(User).filter((User.email == email) | (User.nickname == nickname) | (User.brawl_tag == tag)).first():
         session.close()
         return web.json_response({"error": "User already exists"}, status=409)
+    # telegram_id теперь не передаём
     user = User(
-        telegram_id=0,
         nickname=nickname,
         brawl_tag=tag,
         email=email,
