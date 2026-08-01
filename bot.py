@@ -9,15 +9,28 @@ from config import BOT_TOKEN, WEBAPP_URL
 from database.db import init_db
 from handlers.auth import router as auth_router
 from handlers.profile import router as profile_router
-from api.auth import *
+from api.auth import (
+    login, register, get_profile, verify_club, change_password, update_profile,
+    get_leaderboard,
+    get_friends, get_friend_requests, send_friend_request, accept_friend_request, reject_friend_request, remove_friend,
+    create_room, join_room, leave_room, disband_room, get_room,
+    send_message, get_messages,
+    upload_avatar, upload_banner, get_banners, select_banner,
+    get_battles
+)
+import os
 
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+bot = Bot(
+    token=BOT_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 dp = Dispatcher()
 dp.include_router(auth_router)
 dp.include_router(profile_router)
 
 app = web.Application()
 
+# CORS middleware (исправленный вариант)
 async def cors_middleware(app_instance, handler):
     async def middleware_handler(request):
         if request.method == 'OPTIONS':
@@ -49,16 +62,32 @@ app.router.add_route('GET', '/api/friend-requests', get_friend_requests)
 app.router.add_route('POST', '/api/friend-request', send_friend_request)
 app.router.add_route('POST', '/api/friend-request/accept', accept_friend_request)
 app.router.add_route('POST', '/api/friend-request/reject', reject_friend_request)
+app.router.add_route('DELETE', '/api/friends', remove_friend)
 
 # Rooms
 app.router.add_route('POST', '/api/rooms', create_room)
 app.router.add_route('POST', '/api/rooms/join', join_room)
 app.router.add_route('POST', '/api/rooms/leave', leave_room)
 app.router.add_route('DELETE', '/api/rooms', disband_room)
+app.router.add_route('GET', '/api/rooms/{room_id}', get_room)
 
 # Chat
 app.router.add_route('POST', '/api/messages', send_message)
 app.router.add_route('GET', '/api/messages', get_messages)
+
+# Avatar / Banner
+app.router.add_route('POST', '/api/avatar', upload_avatar)
+app.router.add_route('POST', '/api/banner', upload_banner)
+app.router.add_route('GET', '/api/banners', get_banners)
+app.router.add_route('POST', '/api/banner/select', select_banner)
+
+# Battles (пока заглушка)
+app.router.add_route('GET', '/api/battles', get_battles)
+
+# Статическая раздача
+static_dir = os.path.join(os.getenv('DATA_DIR', '/app/data'))
+os.makedirs(static_dir, exist_ok=True)
+app.router.add_static('/static/', path=static_dir)
 
 # Webapp
 async def webapp_handler(request):
@@ -68,14 +97,9 @@ async def webapp_handler(request):
         return web.Response(text=html, content_type='text/html')
     except FileNotFoundError:
         return web.Response(text="App not found", status=404)
+
 app.router.add_route('GET', '/app', webapp_handler)
 
-# Static
-static_dir = os.path.join(os.getenv('DATA_DIR', '/app/data'))
-os.makedirs(static_dir, exist_ok=True)
-app.router.add_static('/static/', path=static_dir)
-
-# Root
 async def index(request):
     return web.json_response({"status": "ok", "service": "ESBrawlElite API"})
 app.router.add_route('GET', '/', index)
@@ -85,7 +109,9 @@ async def cmd_start(message: Message, state: FSMContext = None):
     if state:
         await state.clear()
     kb = ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))]],
+        keyboard=[
+            [KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))]
+        ],
         resize_keyboard=True
     )
     await message.answer(
