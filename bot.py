@@ -22,6 +22,7 @@ dp.include_router(profile_router)
 
 app = web.Application()
 
+@web.middleware
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         response = web.Response(status=204)
