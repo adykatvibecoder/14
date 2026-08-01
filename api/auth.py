@@ -25,7 +25,6 @@ async def login(request):
     if not user or user.password_hash != hash_password(password):
         session.close()
         return web.json_response({"error": "Invalid credentials"}, status=401)
-    session.commit()
     profile = {
         "id": user.id,
         "nickname": user.nickname,
@@ -129,3 +128,26 @@ async def verify_club(request):
         return web.json_response({"success": True, "verified": True})
     else:
         return web.json_response({"success": False, "verified": False, "message": "Tag not found in club"})
+
+async def change_password(request):
+    try:
+        data = await request.json()
+    except:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+    user_id = data.get("user_id")
+    old_password = data.get("old_password")
+    new_password = data.get("new_password")
+    if not all([user_id, old_password, new_password]):
+        return web.json_response({"error": "All fields required"}, status=400)
+    session = Session()
+    user = session.query(User).filter_by(id=int(user_id)).first()
+    if not user or user.password_hash != hash_password(old_password):
+        session.close()
+        return web.json_response({"error": "Invalid old password"}, status=401)
+    if len(new_password) < 6:
+        session.close()
+        return web.json_response({"error": "Password too short"}, status=400)
+    user.password_hash = hash_password(new_password)
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
