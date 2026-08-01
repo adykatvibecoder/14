@@ -6,7 +6,7 @@
     <title>ESBrawlElite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ===== Все стили (без изменений) ===== */
+        /* ===== CSS-переменные ===== */
         :root {
             --bg: #ffffff;
             --text: #000000;
@@ -380,7 +380,7 @@
             .room-code-block .btn { margin-left:0; }
         }
         .tab-content-inner { animation:slideDown 0.5s ease-out both; }
-        /* battle list styles (не включены в ваш CSS, но используются в renderBattles) */
+        /* battle list styles */
         .battle-list { display:flex; flex-direction:column; gap:10px; padding-bottom:12px; }
         .battle-card { border-radius:12px; padding:12px; color:#fff; min-height:140px; display:flex; flex-direction:column; justify-content:space-between; background-size:cover; background-position:center; }
         .battle-header { display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:6px; }
@@ -525,7 +525,7 @@
             selectBanner: (user_id, banner_id) => fetch('/api/banner/select', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({user_id, banner_id}) }).then(r=>r.json()),
         };
 
-        // ===== Переводы (полные) =====
+        // ===== Переводы =====
         const i18n = {
             ru: {
                 login_title:'Вход', login_btn:'Войти', no_account:'У меня нет аккаунта', forgot_password:'Забыли пароль?',
@@ -826,7 +826,6 @@
                 container.innerHTML = `<p style="text-align:center;color:var(--info-label);padding:30px">${t('profile_no_data')}</p>`;
                 return;
             }
-            // Загружаем актуальные данные пользователя
             const data = await api.getProfile(userData.id);
             if (data) {
                 userData = { ...userData, ...data };
@@ -1055,9 +1054,7 @@
         async function renderBattles(container) {
             try {
                 const battles = await api.getBattles(userData.id);
-                // Генерируем визуализацию, аналогичную предыдущей (с моками)
-                // В реальности нужно адаптировать под формат с сервера.
-                // Для примера используем упрощённую версию.
+                // Генерируем визуализацию
                 if (!battles || battles.length === 0) {
                     container.innerHTML = `<p style="text-align:center;color:var(--info-label);padding:20px;">Боев пока нет</p>`;
                     return;
@@ -1179,33 +1176,54 @@
 
         // ===== Комнаты (действия) =====
         async function createRoom() {
-            const data = await api.createRoom(userData.id);
-            currentRoomId = data.room_id;
-            renderSearch(document.querySelector('.tab-content-inner'));
+            try {
+                const data = await api.createRoom(userData.id);
+                if (data && data.room_id) {
+                    currentRoomId = data.room_id;
+                    renderSearch(document.querySelector('.tab-content-inner'));
+                } else {
+                    alert('Ошибка создания комнаты');
+                }
+            } catch(e) {
+                alert('Ошибка сети при создании комнаты');
+            }
         }
 
         async function joinRoom(code) {
-            const data = await api.joinRoom(userData.id, code);
-            if (data.room_id) {
-                currentRoomId = data.room_id;
-                renderSearch(document.querySelector('.tab-content-inner'));
-                return true;
-            } else {
-                alert(data.error || t('rooms_room_not_found'));
+            try {
+                const data = await api.joinRoom(userData.id, code);
+                if (data.room_id) {
+                    currentRoomId = data.room_id;
+                    renderSearch(document.querySelector('.tab-content-inner'));
+                    return true;
+                } else {
+                    alert(data.error || t('rooms_room_not_found'));
+                    return false;
+                }
+            } catch(e) {
+                alert('Ошибка сети');
                 return false;
             }
         }
 
         async function leaveRoom() {
-            await api.leaveRoom(userData.id, currentRoomId);
-            currentRoomId = null;
-            renderSearch(document.querySelector('.tab-content-inner'));
+            try {
+                await api.leaveRoom(userData.id, currentRoomId);
+                currentRoomId = null;
+                renderSearch(document.querySelector('.tab-content-inner'));
+            } catch(e) {
+                alert('Ошибка при выходе из комнаты');
+            }
         }
 
         async function disbandRoom() {
-            await api.disbandRoom(userData.id, currentRoomId);
-            currentRoomId = null;
-            renderSearch(document.querySelector('.tab-content-inner'));
+            try {
+                await api.disbandRoom(userData.id, currentRoomId);
+                currentRoomId = null;
+                renderSearch(document.querySelector('.tab-content-inner'));
+            } catch(e) {
+                alert('Ошибка при расформировании комнаты');
+            }
         }
 
         async function sendChatMessage() {
@@ -1213,9 +1231,12 @@
             if (!input) return;
             const text = input.value.trim();
             if (!text) return;
-            await api.sendMessage(currentRoomId, userData.id, text);
-            input.value = '';
-            // Сообщение появится при следующем опросе
+            try {
+                await api.sendMessage(currentRoomId, userData.id, text);
+                input.value = '';
+            } catch(e) {
+                alert('Ошибка отправки сообщения');
+            }
         }
 
         function openJoinModal() {
@@ -1259,8 +1280,6 @@
 
         function startTournamentSearch(mode) {
             if (currentRoomId) {
-                const room = api.getRoom(currentRoomId); // не async, но для заглушки
-                // В реальности нужно проверить, что пользователь капитан, но уже есть в интерфейсе.
                 alert(`${t('rooms_search_started')} (${mode})`);
             } else {
                 alert(`Поиск турнира ${mode} начат!`);
@@ -1398,8 +1417,7 @@
 
         async function renderBannerGrid() {
             const grid = document.getElementById('bannerGrid');
-            const userBanners = await api.getBanners(); // список доступных баннеров
-            // Пока используем статические данные, но можно заменить на userBanners
+            // Используем статические данные, можно заменить на userBanners
             let html = '';
             bannerData.forEach(b => {
                 const selected = userData.bannerId === b.id;
@@ -1424,7 +1442,6 @@
                 item.addEventListener('click', async function() {
                     const id = this.dataset.id;
                     if (id === 'custom') {
-                        // Загружаем свой баннер
                         const inp = document.createElement('input');
                         inp.type = 'file';
                         inp.accept = 'image/*';
@@ -1456,7 +1473,6 @@
         }
 
         async function editCustomBanner() {
-            // Аналогично uploadBanner, но для модального окна
             const inp = document.createElement('input');
             inp.type = 'file';
             inp.accept = 'image/*';
@@ -1489,7 +1505,6 @@
                 const data = await api.login(c, p);
                 if (data.error) { err.textContent = data.error; return; }
                 userData = data;
-                // Сохраняем сессию в localStorage
                 localStorage.setItem('esbrawl_session', JSON.stringify(data));
                 userSettings.language = userData.language || 'ru';
                 userSettings.theme = userData.theme || 'light';
@@ -1549,7 +1564,6 @@
             const suc = document.getElementById('reset_success');
             if (!e) { err.textContent = t('enter_email'); suc.textContent = ''; return; }
             err.textContent = '';
-            // Здесь можно вызвать API сброса, но пока заглушка
             suc.textContent = t('reset_sent') + e;
         }
 
@@ -1561,7 +1575,7 @@
             showLogin();
         }
 
-        // ===== Восстановление сессии из localStorage =====
+        // ===== Восстановление сессии =====
         function restoreSession() {
             const saved = localStorage.getItem('esbrawl_session');
             if (saved) {
