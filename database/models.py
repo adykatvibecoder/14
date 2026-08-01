@@ -22,5 +22,7 @@ class User(Base):
     sound = Column(Boolean, default=True)
     notifications = Column(Boolean, default=True)
     color_theme = Column(String(20), default="blue")
+    avatar_url = Column(String(500), default="")
+    banner_url = Column(String(500), default="")
     created_at = Column(DateTime, server_default=func.now())
     last_login = Column(DateTime, server_default=func.now())
