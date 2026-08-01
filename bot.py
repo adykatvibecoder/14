@@ -22,7 +22,6 @@ dp.include_router(profile_router)
 
 app = web.Application()
 
-# Middleware для CORS
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         response = web.Response(status=204)
@@ -35,14 +34,12 @@ async def cors_middleware(request, handler):
 
 app.middlewares.append(cors_middleware)
 
-# API маршруты
 app.router.add_route('POST', '/api/login', login)
 app.router.add_route('POST', '/api/register', register)
 app.router.add_route('GET', '/api/profile', get_profile)
 app.router.add_route('POST', '/api/verify-club', verify_club)
 app.router.add_route('POST', '/api/change-password', change_password)
 
-# Раздача Mini App (webapp/index.html)
 async def webapp_handler(request):
     try:
         with open('webapp/index.html', 'r', encoding='utf-8') as f:
@@ -53,12 +50,10 @@ async def webapp_handler(request):
 
 app.router.add_route('GET', '/app', webapp_handler)
 
-# Главная страница API
 async def index(request):
     return web.json_response({"status": "ok", "service": "ESBrawlElite API"})
 app.router.add_route('GET', '/', index)
 
-# Команда /start
 @dp.message(F.text == "/start")
 async def cmd_start(message: Message, state: FSMContext = None):
     if state:
