@@ -1,31 +1,21 @@
-import json
-import hashlib
+import json, hashlib, os, uuid
 from aiohttp import web
 from database.db import Session
-from database.models import User
+from database.models import User, FriendRequest, Room, RoomMember, Message
 from services.brawl_api import is_tag_in_club
 from config import VERIFY_CLUB_TAG
+
+DATA_DIR = os.getenv("DATA_DIR", "/app/data")
+AVATAR_DIR = os.path.join(DATA_DIR, "avatars")
+BANNER_DIR = os.path.join(DATA_DIR, "banners")
+os.makedirs(AVATAR_DIR, exist_ok=True)
+os.makedirs(BANNER_DIR, exist_ok=True)
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
-async def login(request):
-    try:
-        data = await request.json()
-    except:
-        return web.json_response({"error": "Invalid JSON"}, status=400)
-    login = data.get("login")
-    password = data.get("password")
-    if not login or not password:
-        return web.json_response({"error": "login and password required"}, status=400)
-    session = Session()
-    user = session.query(User).filter(
-        (User.email == login) | (User.nickname == login) | (User.brawl_tag == login)
-    ).first()
-    if not user or user.password_hash != hash_password(password):
-        session.close()
-        return web.json_response({"error": "Invalid credentials"}, status=401)
-    profile = {
+def user_profile(user):
+    return {
         "id": user.id,
         "nickname": user.nickname,
         "brawl_tag": user.brawl_tag,
@@ -46,14 +36,27 @@ async def login(request):
         "notifications": user.notifications,
         "color_theme": user.color_theme or "#e94560"
     }
+
+# ------------------- auth -------------------
+async def login(request):
+    data = await request.json()
+    login = data.get("login")
+    password = data.get("password")
+    if not login or not password:
+        return web.json_response({"error": "login and password required"}, status=400)
+    session = Session()
+    user = session.query(User).filter(
+        (User.email == login) | (User.nickname == login) | (User.brawl_tag == login)
+    ).first()
+    if not user or user.password_hash != hash_password(password):
+        session.close()
+        return web.json_response({"error": "Invalid credentials"}, status=401)
+    profile = user_profile(user)
     session.close()
     return web.json_response(profile)
 
 async def register(request):
-    try:
-        data = await request.json()
-    except:
-        return web.json_response({"error": "Invalid JSON"}, status=400)
+    data = await request.json()
     nickname = data.get("nickname")
     tag = data.get("tag")
     email = data.get("email")
@@ -72,7 +75,6 @@ async def register(request):
     if session.query(User).filter((User.email == email) | (User.nickname == nickname) | (User.brawl_tag == tag)).first():
         session.close()
         return web.json_response({"error": "User already exists"}, status=409)
-    # telegram_id теперь не передаём
     user = User(
         nickname=nickname,
         brawl_tag=tag,
@@ -95,30 +97,12 @@ async def get_profile(request):
     if not user:
         session.close()
         return web.json_response({"error": "User not found"}, status=404)
-    profile = {
-        "id": user.id,
-        "nickname": user.nickname,
-        "brawl_tag": user.brawl_tag,
-        "brawl_name": user.brawl_name,
-        "elo": user.elo,
-        "wins": user.wins,
-        "losses": user.losses,
-        "games": user.wins + user.losses,
-        "winrate": round(user.wins / (user.wins + user.losses) * 100, 1) if (user.wins + user.losses) > 0 else 0,
-        "reg_date": user.created_at.strftime("%d.%m.%Y") if user.created_at else "—",
-        "description": user.description or "",
-        "verified": user.verified,
-        "avatarUrl": user.avatar_url or "",
-        "bannerUrl": user.banner_url or ""
-    }
+    profile = user_profile(user)
     session.close()
     return web.json_response(profile)
 
 async def verify_club(request):
-    try:
-        data = await request.json()
-    except:
-        return web.json_response({"error": "Invalid JSON"}, status=400)
+    data = await request.json()
     tag = data.get("tag")
     user_id = data.get("user_id")
     if not tag or not user_id:
@@ -135,10 +119,7 @@ async def verify_club(request):
         return web.json_response({"success": False, "verified": False, "message": "Tag not found in club"})
 
 async def change_password(request):
-    try:
-        data = await request.json()
-    except:
-        return web.json_response({"error": "Invalid JSON"}, status=400)
+    data = await request.json()
     user_id = data.get("user_id")
     old_password = data.get("old_password")
     new_password = data.get("new_password")
@@ -156,3 +137,224 @@ async def change_password(request):
     session.commit()
     session.close()
     return web.json_response({"success": True})
+
+async def update_profile(request):
+    data = await request.json()
+    user_id = data.get("user_id")
+    if not user_id:
+        return web.json_response({"error": "user_id required"}, status=400)
+    session = Session()
+    user = session.query(User).filter_by(id=int(user_id)).first()
+    if not user:
+        session.close()
+        return web.json_response({"error": "User not found"}, status=404)
+    updatable = ["description", "language", "theme", "sound", "notifications", "color_theme", "avatar_url", "banner_url"]
+    for field in updatable:
+        if field in data:
+            setattr(user, field, data[field])
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+# ------------------- leaderboard -------------------
+async def get_leaderboard(request):
+    limit = int(request.rel_url.query.get("limit", 50))
+    session = Session()
+    users = session.query(User).filter(User.verified == True).order_by(User.elo.desc()).limit(limit).all()
+    result = []
+    for i, u in enumerate(users, 1):
+        result.append({
+            "rank": i,
+            "id": u.id,
+            "nickname": u.nickname,
+            "brawl_tag": u.brawl_tag,
+            "elo": u.elo,
+            "avatarUrl": u.avatar_url or ""
+        })
+    session.close()
+    return web.json_response(result)
+
+# ------------------- friends -------------------
+async def get_friends(request):
+    user_id = int(request.rel_url.query.get("user_id"))
+    session = Session()
+    # accepted friends (both directions)
+    sent = session.query(FriendRequest).filter(FriendRequest.from_user_id == user_id, FriendRequest.status == "accepted").all()
+    received = session.query(FriendRequest).filter(FriendRequest.to_user_id == user_id, FriendRequest.status == "accepted").all()
+    friends = []
+    for f in sent:
+        friends.append(user_profile(f.to_user))
+    for f in received:
+        friends.append(user_profile(f.from_user))
+    session.close()
+    return web.json_response(friends)
+
+async def send_friend_request(request):
+    data = await request.json()
+    from_id = data.get("from_user_id")
+    to_id = data.get("to_user_id")
+    if not from_id or not to_id:
+        return web.json_response({"error": "from_user_id and to_user_id required"}, status=400)
+    session = Session()
+    # check existing
+    existing = session.query(FriendRequest).filter(
+        ((FriendRequest.from_user_id == from_id) & (FriendRequest.to_user_id == to_id)) |
+        ((FriendRequest.from_user_id == to_id) & (FriendRequest.to_user_id == from_id))
+    ).first()
+    if existing:
+        session.close()
+        return web.json_response({"error": "Request already exists"}, status=409)
+    fr = FriendRequest(from_user_id=from_id, to_user_id=to_id, status="pending")
+    session.add(fr)
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+async def accept_friend_request(request):
+    data = await request.json()
+    request_id = data.get("request_id")
+    session = Session()
+    fr = session.query(FriendRequest).filter_by(id=request_id).first()
+    if not fr or fr.status != "pending":
+        session.close()
+        return web.json_response({"error": "Invalid request"}, status=404)
+    fr.status = "accepted"
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+async def reject_friend_request(request):
+    data = await request.json()
+    request_id = data.get("request_id")
+    session = Session()
+    fr = session.query(FriendRequest).filter_by(id=request_id).first()
+    if fr:
+        session.delete(fr)
+        session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+async def get_friend_requests(request):
+    user_id = int(request.rel_url.query.get("user_id"))
+    session = Session()
+    pending = session.query(FriendRequest).filter(FriendRequest.to_user_id == user_id, FriendRequest.status == "pending").all()
+    result = []
+    for fr in pending:
+        result.append({
+            "request_id": fr.id,
+            "from_user": user_profile(fr.from_user)
+        })
+    session.close()
+    return web.json_response(result)
+
+# ------------------- rooms -------------------
+def generate_room_code(session):
+    import random, string
+    while True:
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        if not session.query(Room).filter_by(code=code).first():
+            return code
+
+async def create_room(request):
+    data = await request.json()
+    user_id = data.get("user_id")
+    if not user_id:
+        return web.json_response({"error": "user_id required"}, status=400)
+    session = Session()
+    code = generate_room_code(session)
+    room = Room(id=str(uuid.uuid4()), code=code, host_id=user_id)
+    session.add(room)
+    session.flush()
+    # add creator as member
+    member = RoomMember(room_id=room.id, user_id=user_id)
+    session.add(member)
+    session.commit()
+    session.close()
+    return web.json_response({"room_id": room.id, "code": code})
+
+async def join_room(request):
+    data = await request.json()
+    user_id = data.get("user_id")
+    code = data.get("code")
+    if not user_id or not code:
+        return web.json_response({"error": "user_id and code required"}, status=400)
+    session = Session()
+    room = session.query(Room).filter_by(code=code.upper()).first()
+    if not room:
+        session.close()
+        return web.json_response({"error": "Room not found"}, status=404)
+    if len(room.members) >= 3:
+        session.close()
+        return web.json_response({"error": "Room is full"}, status=400)
+    if any(m.user_id == user_id for m in room.members):
+        session.close()
+        return web.json_response({"error": "Already in room"}, status=400)
+    member = RoomMember(room_id=room.id, user_id=user_id)
+    session.add(member)
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+async def leave_room(request):
+    data = await request.json()
+    user_id = data.get("user_id")
+    room_id = data.get("room_id")
+    if not user_id or not room_id:
+        return web.json_response({"error": "user_id and room_id required"}, status=400)
+    session = Session()
+    member = session.query(RoomMember).filter_by(room_id=room_id, user_id=user_id).first()
+    if member:
+        session.delete(member)
+        session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+async def disband_room(request):
+    data = await request.json()
+    user_id = data.get("user_id")
+    room_id = data.get("room_id")
+    if not user_id or not room_id:
+        return web.json_response({"error": "user_id and room_id required"}, status=400)
+    session = Session()
+    room = session.query(Room).filter_by(id=room_id).first()
+    if not room or room.host_id != user_id:
+        session.close()
+        return web.json_response({"error": "Only host can disband"}, status=403)
+    session.delete(room)  # cascade delete members & messages
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+# ------------------- chat -------------------
+async def send_message(request):
+    data = await request.json()
+    room_id = data.get("room_id")
+    user_id = data.get("user_id")
+    text = data.get("text")
+    if not all([room_id, user_id, text]):
+        return web.json_response({"error": "room_id, user_id, text required"}, status=400)
+    session = Session()
+    # verify user is member
+    member = session.query(RoomMember).filter_by(room_id=room_id, user_id=user_id).first()
+    if not member:
+        session.close()
+        return web.json_response({"error": "Not a member"}, status=403)
+    msg = Message(room_id=room_id, sender_id=user_id, text=text)
+    session.add(msg)
+    session.commit()
+    session.close()
+    return web.json_response({"success": True})
+
+async def get_messages(request):
+    room_id = request.rel_url.query.get("room_id")
+    since = int(request.rel_url.query.get("since", "0"))
+    session = Session()
+    msgs = session.query(Message).filter(Message.room_id == room_id, Message.id > since).order_by(Message.id.asc()).all()
+    result = [{
+        "id": m.id,
+        "sender": m.sender.nickname,
+        "text": m.text,
+        "time": m.created_at.strftime("%H:%M") if m.created_at else ""
+    } for m in msgs]
+    session.close()
+    return web.json_response(result)
