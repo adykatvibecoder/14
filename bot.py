@@ -1,5 +1,4 @@
 import asyncio
-import json
 from aiohttp import web
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
@@ -11,6 +10,7 @@ from database.db import init_db
 from handlers.auth import router as auth_router
 from handlers.profile import router as profile_router
 from api.auth import login, register, get_profile, verify_club
+import os
 
 bot = Bot(
     token=BOT_TOKEN,
@@ -22,6 +22,7 @@ dp.include_router(profile_router)
 
 app = web.Application()
 
+# Middleware для CORS
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         response = web.Response(status=204)
@@ -34,22 +35,36 @@ async def cors_middleware(request, handler):
 
 app.middlewares.append(cors_middleware)
 
+# API маршруты
 app.router.add_route('POST', '/api/login', login)
 app.router.add_route('POST', '/api/register', register)
 app.router.add_route('GET', '/api/profile', get_profile)
 app.router.add_route('POST', '/api/verify-club', verify_club)
 
+# Раздача Mini App (webapp/index.html)
+async def webapp_handler(request):
+    try:
+        with open('webapp/index.html', 'r', encoding='utf-8') as f:
+            html = f.read()
+        return web.Response(text=html, content_type='text/html')
+    except FileNotFoundError:
+        return web.Response(text="App not found", status=404)
+
+app.router.add_route('GET', '/app', webapp_handler)
+
+# Главная страница API
 async def index(request):
     return web.json_response({"status": "ok", "service": "ESBrawlElite API"})
 app.router.add_route('GET', '/', index)
 
+# Команда /start
 @dp.message(F.text == "/start")
 async def cmd_start(message: Message, state: FSMContext = None):
     if state:
         await state.clear()
     kb = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=WEBAPP_URL))],
+            [KeyboardButton(text="Открыть ESBrawlElite", web_app=WebAppInfo(url=f"{WEBAPP_URL}/app"))],
             [KeyboardButton(text="Профиль")],
             [KeyboardButton(text="Регистрация"), KeyboardButton(text="Вход")]
         ],
