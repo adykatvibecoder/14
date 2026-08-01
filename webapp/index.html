@@ -1489,6 +1489,8 @@
                 const data = await api.login(c, p);
                 if (data.error) { err.textContent = data.error; return; }
                 userData = data;
+                // Сохраняем сессию в localStorage
+                localStorage.setItem('esbrawl_session', JSON.stringify(data));
                 userSettings.language = userData.language || 'ru';
                 userSettings.theme = userData.theme || 'light';
                 userSettings.sound = userData.sound !== false;
@@ -1555,11 +1557,41 @@
             userData = null;
             if (chatInterval) clearInterval(chatInterval);
             currentRoomId = null;
+            localStorage.removeItem('esbrawl_session');
             showLogin();
         }
 
+        // ===== Восстановление сессии из localStorage =====
+        function restoreSession() {
+            const saved = localStorage.getItem('esbrawl_session');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data && data.id) {
+                        userData = data;
+                        userSettings.language = userData.language || 'ru';
+                        userSettings.theme = userData.theme || 'light';
+                        userSettings.sound = userData.sound !== false;
+                        userSettings.notifications = userData.notifications !== false;
+                        userSettings.colorTheme = userData.color_theme || '#e94560';
+                        applyThemeAndColor();
+                        updateLanguage();
+                        if (!userData.verified) {
+                            showVerify();
+                        } else {
+                            showMain();
+                        }
+                        return true;
+                    }
+                } catch(e) {}
+            }
+            return false;
+        }
+
         // ===== Инициализация =====
-        showLogin();
+        if (!restoreSession()) {
+            showLogin();
+        }
         applyThemeAndColor();
         updateLanguage();
         document.querySelectorAll('.input').forEach(el => {
